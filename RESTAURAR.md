@@ -58,6 +58,7 @@ Para voltar a qualquer uma delas, troque `ponto-zero` pelo nome da marca no coma
 | Marca | O que e |
 |---|---|
 | `ponto-zero` | O estado descrito acima. O chao seguro. |
+| `fase2-som-e-impacto` | Som de arcade (ruido, impacto, explosao, combo, ambiente), congelamento de quadro, tranco de camera, tremor e destrocos em voxel nas 5 cenas 3D. 66 testes. |
 
 ---
 

@@ -83,6 +83,22 @@ git checkout main
 
 ---
 
+## Copia online (GitHub Pages)
+
+Existe um fluxo em `.github/workflows/pages.yml` que publica o jogo a cada push
+na `main`. Ele roda os testes primeiro: **teste quebrado nao sobe site**.
+
+O estande de verdade **nao depende disso**. No dia da feira roda o
+`INICIAR-ESTANDE.bat`, em localhost, sem internet. O Pages e para ver de
+qualquer lugar e para ter uma copia viva fora desta maquina.
+
+Duas coisas para saber:
+
+- O ranking do Pages e **separado** do ranking do estande. Cada endereco tem o
+  proprio armazenamento no navegador, e `localhost` nao e `github.io`.
+- O repositorio precisa ser **publico** para o Pages funcionar em conta gratuita.
+  Em conta paga (Pro ou Team) funciona com repositorio privado.
+
 ## Se o git nao existir mais
 
 Se alguem apagou a pasta `.git`, o historico se foi e este arquivo nao salva ninguem.

@@ -1,0 +1,62 @@
+# Publica o MISSAO TI no GitHub Pages a cada push na main.
+#
+# O estande de verdade NAO usa isto: no dia da feira roda o INICIAR-ESTANDE.bat,
+# em localhost, sem depender de internet. Isto aqui e para ver de qualquer lugar
+# e para deixar uma copia viva fora da maquina.
+#
+# Funciona em subcaminho (usuario.github.io/repositorio/) porque o vite.config.ts
+# usa `base: './'`, entao todo caminho gerado e relativo. Testado servindo o
+# dist/ dentro de uma subpasta: html, css, js e as 16 fontes responderam 200.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  # Permite disparar na mao pela aba Actions, sem precisar de commit.
+  workflow_dispatch:
+
+# O token so precisa publicar. Nada alem disso.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Se dois pushes entrarem juntos, o segundo espera em vez de brigar pelo site.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # A mesma versao da maquina onde o jogo foi feito. Os testes usam
+          # o modo de tipos nativo do Node, que so existe daqui para cima.
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      # Se um teste quebrar, o site nao sobe. E o unico portao automatico
+      # que existe neste projeto, entao ele vale.
+      - run: npm test
+
+      - run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

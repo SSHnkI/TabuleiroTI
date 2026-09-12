@@ -22,6 +22,25 @@ import { Seguranca } from '@/minigames/Seguranca.tsx'
 import { GameHud } from '@/components/GameHud.tsx'
 import { DIFFICULTY_LABEL } from '@/game/scoring.ts'
 import type { GameState } from '@/game/state.ts'
+import { useFx } from '@/visual/Fx.tsx'
+import { ambiente, type AmbienteId } from '@/game/sound.ts'
+
+/**
+ * Leito de som por desafio, SO para os que vivem no DOM.
+ *
+ * Os cinco em 3D ligam o ambiente deles dentro da propria cena, junto com o
+ * resto da montagem. Se esta tela tambem ligasse, o efeito do pai rodaria
+ * depois do filho e atropelaria a escolha dele.
+ */
+const AMBIENTE_DOM: Partial<Record<string, AmbienteId>> = {
+  scanner: 'rede',
+  fluxo: 'fabrica',
+  timeline: 'rede',
+  firewall: 'servidores',
+  triagem: 'fabrica',
+  phishing: 'rede',
+  backup: 'servidores',
+}
 
 /** Quanto tempo o anuncio de vez fica na tela antes do desafio comecar. */
 const TURN_MS = 1700
@@ -36,6 +55,18 @@ export function Play({ state, onDone, onPenalty, onPause }: {
 }) {
   const spec = state.round[state.index]
   const player = state.mode === 'revezamento' ? state.players[state.turn] : undefined
+  const fx = useFx()
+
+  // Cada desafio comeca a escalada do chao. Herdar a sequencia do desafio
+  // anterior inflaria o selo sem a pessoa ter feito nada para merecer.
+  useEffect(() => { fx.zerarCombo() }, [state.index])
+
+  const leito = spec ? AMBIENTE_DOM[spec.id] : undefined
+  useEffect(() => {
+    if (!leito) return
+    ambiente(leito)
+    return () => ambiente(null)
+  }, [leito])
 
   // Anuncio de vez: aparece a cada troca de jogador, e SO no revezamento.
   // Sem ele, num grupo de quatro ninguem sabe de quem e a vez, e a partida

@@ -46,11 +46,20 @@ export default function App() {
   useEffect(() => startPerfMonitor(), [])
 
   // O navegador so libera audio apos um gesto. Destravar no primeiro toque
-  // da sessao evita o primeiro efeito sonoro sair mudo.
+  // da sessao evita o primeiro efeito sonoro sair mudo. Tecla tambem conta:
+  // quem chega pelo teclado jogava a partida inteira no mudo.
   useEffect(() => {
-    const once = () => { unlockAudio(); window.removeEventListener('pointerdown', once) }
+    const once = () => {
+      unlockAudio()
+      window.removeEventListener('pointerdown', once)
+      window.removeEventListener('keydown', once)
+    }
     window.addEventListener('pointerdown', once)
-    return () => window.removeEventListener('pointerdown', once)
+    window.addEventListener('keydown', once)
+    return () => {
+      window.removeEventListener('pointerdown', once)
+      window.removeEventListener('keydown', once)
+    }
   }, [])
   useEffect(() => subscribePerf(setPerf), [])
   useEffect(() => subscribe(setRuns), [])

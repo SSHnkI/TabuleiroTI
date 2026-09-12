@@ -16,6 +16,9 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Renderer, Camera, Transform, Box, Sphere, Program, Mesh, Raycast, Vec2, Vec3 } from 'ogl'
 import { PALETA, PISO_VERT, PISO_FRAG } from '../visual/palette.glsl.ts'
+import { criarJuice } from '../visual/juice.ts'
+import { criarDestrocos } from '../visual/debris.ts'
+import { ambiente, sExplosao, sEstilhaco } from '@/game/sound.ts'
 import { RotateCw, Network, Check, TriangleAlert } from 'lucide-react'
 import { HudLabel } from '@/components/hud'
 import { useStuck, StuckHint } from '@/components/StuckHint'
@@ -137,6 +140,9 @@ export function Rede({ net, secondsLeft, onDone, onPenalty }: {
 
   const yawTarget = useRef(0.4)
   const reset = useRef<(() => void) | null>(null)
+  /** Ponte do toque (React) para o estrago (laco 3D): o React decide se
+   *  acertou, o laco 3D faz o estrago no lugar certo da cena. */
+  const golpe = useRef<((alvoId: string, acertou: boolean) => void) | null>(null)
 
   function finish(ratio: number) {
     if (finished.current) return
@@ -184,6 +190,10 @@ export function Rede({ net, secondsLeft, onDone, onPenalty }: {
 
     const rig = new Transform()
     rig.setParent(scene)
+
+    const juice = criarJuice()
+    const destrocos = criarDestrocos(gl, rig, { chao: -6.5, tamanho: 0.20 })
+    ambiente('rede')
 
     const pos = new Map(net.nodes.map(n => [n.id, new Vec3(n.x, n.y, n.z)]))
 
@@ -262,6 +272,7 @@ export function Rede({ net, secondsLeft, onDone, onPenalty }: {
       const dist = Math.max(altura / (2 * t), largura / (2 * t * aspect)) * 1.08
       camera.position.set(0, 0, dist)
       camera.lookAt([0, 0, 0])
+      juice.ancorar(camera)
     }
     const ro = new ResizeObserver(resize)
     ro.observe(host)
@@ -307,16 +318,28 @@ export function Rede({ net, secondsLeft, onDone, onPenalty }: {
 
     reset.current = () => { yawTarget.current = 0.4 }
 
+    golpe.current = (alvoId, acertou) => {
+      const n = net.nodes.find(x => x.id === alvoId)
+      if (!n) return
+      const pos: [number, number, number] = [n.x, n.y, n.z]
+      if (acertou) {
+        destrocos.explodir(pos, [0.145, 0.875, 0.627], 34, 1.7)
+        juice.congelar(85); juice.tranco(1.1); juice.tremor(0.5)
+        sExplosao()
+      } else {
+        destrocos.explodir(pos, [1.0, 0.247, 0.18], 16, 0.95)
+        juice.congelar(45); juice.tremor(0.7)
+        sEstilhaco()
+      }
+    }
+
     let raf = 0
-    let last = performance.now()
-    const start = last
 
     function frame(now: number) {
       raf = requestAnimationFrame(frame)
       if (document.hidden) return
-      const dt = Math.min(0.05, (now - last) / 1000)
-      last = now
-      const t = (now - start) / 1000
+      const { dt, t } = juice.tick(now)
+      destrocos.atualizar(dt)
 
       if (intro > 0) yawTarget.current += dt * 0.32
       yaw += (yawTarget.current - yaw) * Math.min(1, dt * 8)
@@ -336,12 +359,15 @@ export function Rede({ net, secondsLeft, onDone, onPenalty }: {
           : 1
       }
 
+      juice.aplicar(camera)
       renderer.render({ scene, camera })
     }
     raf = requestAnimationFrame(frame)
 
     return () => {
       cancelAnimationFrame(raf)
+      ambiente(null)
+      golpe.current = null
       ro.disconnect()
       gl.canvas.removeEventListener('pointerdown', onDown)
       gl.canvas.removeEventListener('pointermove', onMove)
@@ -359,11 +385,13 @@ export function Rede({ net, secondsLeft, onDone, onPenalty }: {
       const next = [...live.current.found, node.id]
       setFound(next)
       setErroSintoma(null)
+      golpe.current?.(node.id, true)
       fx.hit()
       if (next.length >= alvos) setTimeout(() => finish(1), 1000)
       return
     }
 
+    golpe.current?.(node.id, false)
     fx.miss()
     onPenalty()
     // A distincao entre sintoma e causa e a licao do desafio, entao ela e

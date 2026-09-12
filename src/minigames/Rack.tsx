@@ -23,6 +23,9 @@ import {
   Renderer, Camera, Transform, Box, Program, Mesh, Raycast, Vec2, Vec3,
 } from 'ogl'
 import { PALETA, PISO_VERT, PISO_FRAG } from '../visual/palette.glsl.ts'
+import { criarJuice } from '../visual/juice.ts'
+import { criarDestrocos } from '../visual/debris.ts'
+import { ambiente, sExplosao, sEstilhaco } from '@/game/sound.ts'
 import { RotateCw, Server, Check } from 'lucide-react'
 import { HudLabel } from '@/components/hud'
 import { useStuck, StuckHint } from '@/components/StuckHint'
@@ -197,6 +200,9 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
 
   const yawTarget = useRef(0)
   const flip = useRef<(() => void) | null>(null)
+  /** O toque acontece no React, o estrago acontece no laco 3D. Este ref e a
+   *  ponte: guarda a funcao que o laco instalou, para o pick chamar. */
+  const golpe = useRef<((index: number, acertou: boolean) => void) | null>(null)
 
   function finish(ratio: number) {
     if (finished.current) return
@@ -235,6 +241,11 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
 
     const n = rack.units.length
     const totalH = n * (UNIT_H + GAP)
+    const alturaChao = -(totalH / 2 + 0.56)
+
+    const juice = criarJuice()
+    const destrocos = criarDestrocos(gl, rig, { chao: alturaChao + 0.05, tamanho: 0.11 })
+    ambiente('servidores')
 
     // Chao: sem ele o rack flutua no vazio preto. Com ele a peca tem peso e o
     // ambiente vira sala.
@@ -375,6 +386,9 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
       const fitH = (need / 2) / Math.tan((34 * Math.PI) / 360)
       const fitW = (UNIT_W * 1.5 / 2) / (Math.tan((34 * Math.PI) / 360) * aspect)
       camera.position.set(0, 0, Math.max(fitH, fitW) * 1.12)
+      // O tranco e o tremor saem desta posicao. Reancorar a cada resize,
+      // senao a camera volta para o lugar errado depois de girar a tela.
+      juice.ancorar(camera)
     }
     const ro = new ResizeObserver(resize)
     ro.observe(host)
@@ -435,15 +449,36 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
 
     flip.current = () => { yawTarget.current += Math.PI }
 
+    golpe.current = (index, acertou) => {
+      const u = units[index]
+      if (!u) return
+      const y = u.mesh.position.y
+      if (acertou) {
+        // Verde da marca: a mesma cor que o shader usa para "resolvido".
+        destrocos.explodir([0, y, UNIT_D / 2], [0.145, 0.875, 0.627], 30, 1.3)
+        juice.congelar(80)
+        juice.tranco(1)
+        juice.tremor(0.45)
+        sExplosao()
+      } else {
+        destrocos.explodir([0, y, UNIT_D / 2], [1.0, 0.247, 0.18], 14, 0.75)
+        juice.congelar(45)
+        juice.tremor(0.7)
+        sEstilhaco()
+      }
+    }
+
     /* ------------------------------------------------------------- render */
     let raf = 0
-    let last = performance.now()
+    /** Quanto cada unidade ja saiu do rack. Consertada, desliza para fora. */
+    const saida = new Float32Array(units.length)
 
     function frame(now: number) {
       raf = requestAnimationFrame(frame)
       if (document.hidden) return
-      const dt = Math.min(0.05, (now - last) / 1000)
-      last = now
+      const { dt, t } = juice.tick(now)
+
+      destrocos.atualizar(dt)
 
       if (intro > 0) yawTarget.current += dt * 0.5
       // Perseguicao suave: o rack acompanha o dedo com peso, em vez de
@@ -456,21 +491,31 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
 
       for (const u of units) {
         const p = u.mesh.program.uniforms
+        const resolvida = live.current.found.includes(u.index)
         p.uSelected.value = live.current.selected === u.index ? 1 : 0
-        p.uResolved.value = live.current.found.includes(u.index) ? 1 : 0
+        p.uResolved.value = resolvida ? 1 : 0
         // Falha pisca; ok e aviso ficam acesos. Piscar so o que importa e o
         // que faz o olho encontrar a falha de longe.
         p.uBlink.value = u.unit.status === 'falha'
-          ? 0.55 + 0.45 * Math.sin(now * 0.007)
+          ? 0.55 + 0.45 * Math.sin(t * 7.0)
           : 1
+
+        // A unidade consertada desliza para fora do rack. Ver a peca sair e
+        // o que transforma "o LED mudou de cor" em "eu consertei aquilo".
+        const alvo = resolvida ? 0.55 : 0
+        saida[u.index] += (alvo - saida[u.index]) * Math.min(1, dt * 7)
+        u.mesh.position.z = saida[u.index]
       }
 
+      juice.aplicar(camera)
       renderer.render({ scene, camera })
     }
     raf = requestAnimationFrame(frame)
 
     return () => {
       cancelAnimationFrame(raf)
+      ambiente(null)
+      golpe.current = null
       ro.disconnect()
       gl.canvas.removeEventListener('pointerdown', onDown)
       gl.canvas.removeEventListener('pointermove', onMove)
@@ -496,9 +541,11 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
     if (unit.status === 'falha') {
       const next = [...live.current.found, index]
       setFound(next)
+      golpe.current?.(index, true)
       fx.hit()
       if (next.length >= alvos) setTimeout(() => finish(1), 900)
     } else {
+      golpe.current?.(index, false)
       fx.miss()
       onPenalty()
     }

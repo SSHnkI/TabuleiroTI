@@ -16,6 +16,9 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Renderer, Camera, Transform, Box, Sphere, Program, Mesh, Raycast, Vec2 } from 'ogl'
 import { PALETA, PISO_VERT, PISO_FRAG } from '../visual/palette.glsl.ts'
+import { criarJuice } from '../visual/juice.ts'
+import { criarDestrocos } from '../visual/debris.ts'
+import { ambiente, sExplosao, sEstilhaco } from '@/game/sound.ts'
 import { RotateCw, Wifi as WifiIcon, Check, MessageSquareWarning } from 'lucide-react'
 import { HudLabel } from '@/components/hud'
 import { useStuck, StuckHint } from '@/components/StuckHint'
@@ -131,6 +134,9 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
 
   const yawTarget = useRef(-0.5)
   const reset = useRef<(() => void) | null>(null)
+  /** Ponte do toque (React) para o estrago (laco 3D): o React decide se
+   *  acertou, o laco 3D faz o estrago no lugar certo da cena. */
+  const golpe = useRef<((alvoId: number, acertou: boolean) => void) | null>(null)
 
   function finish(ratio: number) {
     if (finished.current) return
@@ -162,6 +168,10 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
     const scene = new Transform()
     const rig = new Transform()
     rig.setParent(scene)
+
+    const juice = criarJuice()
+    const destrocos = criarDestrocos(gl, rig, { chao: 0.06, tamanho: 0.30 })
+    ambiente('fabrica')
 
     /* ------------------------------------------------------------- piso */
     const floor = new Mesh(gl, {
@@ -257,6 +267,7 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
       // ser lida como espaco, e nao como desenho.
       camera.position.set(0, dist * 0.72, dist * 0.68)
       camera.lookAt([0, 0, 0])
+      juice.ancorar(camera)
     }
     const ro = new ResizeObserver(resize)
     ro.observe(host)
@@ -303,13 +314,27 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
 
     reset.current = () => { yawTarget.current = -0.5 }
 
+    golpe.current = (alvoId, acertou) => {
+      const a = apMeshes[alvoId]
+      if (!a) return
+      const pos: [number, number, number] = [a.ap.x, 1.28, a.ap.z]
+      if (acertou) {
+        destrocos.explodir(pos, [0.145, 0.875, 0.627], 32, 2.2)
+        juice.congelar(80); juice.tranco(1); juice.tremor(0.45)
+        sExplosao()
+      } else {
+        destrocos.explodir(pos, [1.0, 0.247, 0.18], 16, 1.2)
+        juice.congelar(45); juice.tremor(0.7)
+        sEstilhaco()
+      }
+    }
+
     let raf = 0
-    let last = performance.now()
     function frame(now: number) {
       raf = requestAnimationFrame(frame)
       if (document.hidden) return
-      const dt = Math.min(0.05, (now - last) / 1000)
-      last = now
+      const { dt } = juice.tick(now)
+      destrocos.atualizar(dt)
 
       if (intro > 0) yawTarget.current += dt * 0.22
       yaw += (yawTarget.current - yaw) * Math.min(1, dt * 8)
@@ -327,12 +352,15 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
         a.dome.scale.set(a.ap.range * b, a.ap.range * 0.55 * b, a.ap.range * b)
       }
 
+      juice.aplicar(camera)
       renderer.render({ scene, camera })
     }
     raf = requestAnimationFrame(frame)
 
     return () => {
       cancelAnimationFrame(raf)
+      ambiente(null)
+      golpe.current = null
       ro.disconnect()
       gl.canvas.removeEventListener('pointerdown', onDown)
       gl.canvas.removeEventListener('pointermove', onMove)
@@ -350,9 +378,11 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
     if (ap.status === 'falha') {
       const next = [...live.current.found, index]
       setFound(next)
+      golpe.current?.(index, true)
       fx.hit()
       if (next.length >= alvos) setTimeout(() => finish(1), 900)
     } else {
+      golpe.current?.(index, false)
       fx.miss()
       onPenalty()
     }

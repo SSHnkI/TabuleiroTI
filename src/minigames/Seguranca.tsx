@@ -19,6 +19,9 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Renderer, Camera, Transform, Box, Sphere, Program, Mesh, Raycast, Vec2, Vec3 } from 'ogl'
 import { PALETA, PISO_VERT, PISO_FRAG } from '../visual/palette.glsl.ts'
+import { criarJuice } from '../visual/juice.ts'
+import { criarDestrocos } from '../visual/debris.ts'
+import { ambiente, sExplosao, sEstilhaco } from '@/game/sound.ts'
 import { RotateCw, ShieldAlert, Check, TriangleAlert } from 'lucide-react'
 import { HudLabel } from '@/components/hud'
 import { useStuck, StuckHint } from '@/components/StuckHint'
@@ -166,6 +169,9 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
 
   const yawTarget = useRef(0)
   const reset = useRef<(() => void) | null>(null)
+  /** Ponte do toque (React) para o estrago (laco 3D): o React decide se
+   *  acertou, o laco 3D faz o estrago no lugar certo da cena. */
+  const golpe = useRef<((alvoId: string, acertou: boolean) => void) | null>(null)
 
   function finish(ratio: number) {
     if (finished.current) return
@@ -185,11 +191,13 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
       const next = [...live.current.found, ac.id]
       setFound(next)
       setErro(null)
+      golpe.current?.(ac.id, true)
       fx.hit()
       if (next.length >= alvos) setTimeout(() => finish(1), 1000)
       return
     }
 
+    golpe.current?.(ac.id, false)
     fx.miss()
     onPenalty()
     setErro('Este acesso confere: ' + ac.usuario + ' em ' + ac.cidade
@@ -232,6 +240,10 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
 
     const rig = new Transform()
     rig.setParent(scene)
+
+    const juice = criarJuice()
+    const destrocos = criarDestrocos(gl, rig, { chao: -9, tamanho: 0.16 })
+    ambiente('orbita')
 
     /* ------------------------------------------------------------- globo */
     const globe = new Mesh(gl, {
@@ -298,6 +310,7 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
       const dist = Math.max(precisa / (2 * t), precisa / (2 * t * aspect)) * 1.05
       camera.position.set(0, 0, dist)
       camera.lookAt([0, 0, 0])
+      juice.ancorar(camera)
     }
     const ro = new ResizeObserver(resize)
     ro.observe(host)
@@ -344,17 +357,29 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
 
     reset.current = () => { yawTarget.current = 0; pitch = 0.15 }
 
+    golpe.current = (alvoId, acertou) => {
+      const m = marks.find(x => x.ac.id === alvoId)
+      if (!m) return
+      const pos: [number, number, number] = [m.origem.x, m.origem.y, m.origem.z]
+      if (acertou) {
+        destrocos.explodir(pos, [0.145, 0.875, 0.627], 34, 1.5)
+        juice.congelar(90); juice.tranco(1.2); juice.tremor(0.55)
+        sExplosao()
+      } else {
+        destrocos.explodir(pos, [1.0, 0.247, 0.18], 16, 0.85)
+        juice.congelar(45); juice.tremor(0.7)
+        sEstilhaco()
+      }
+    }
+
     const tmp = new Vec3()
     let raf = 0
-    let last = performance.now()
-    const start = last
 
     function frame(now: number) {
       raf = requestAnimationFrame(frame)
       if (document.hidden) return
-      const dt = Math.min(0.05, (now - last) / 1000)
-      last = now
-      const t = (now - start) / 1000
+      const { dt, t } = juice.tick(now)
+      destrocos.atualizar(dt)
 
       if (intro > 0) yawTarget.current += dt * 0.16
       yaw += (yawTarget.current - yaw) * Math.min(1, dt * 8)
@@ -380,6 +405,7 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
         }
       }
 
+      juice.aplicar(camera)
       renderer.render({ scene, camera })
 
       const rect = labelBox.current?.getBoundingClientRect()
@@ -405,6 +431,8 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
 
     return () => {
       cancelAnimationFrame(raf)
+      ambiente(null)
+      golpe.current = null
       ro.disconnect()
       gl.canvas.removeEventListener('pointerdown', onDown)
       gl.canvas.removeEventListener('pointermove', onMove)

@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.chrome-estande/
+tsconfig.tsbuildinfo
+*.local
+.DS_Store
+Thumbs.db

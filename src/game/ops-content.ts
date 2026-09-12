@@ -1,0 +1,189 @@
+/**
+ * MISSAO TI :: conteudo dos desafios de operacao (suporte e seguranca).
+ *
+ * Os dois seguem a mesma gramatica dos outros 3D: girar com o dedo, tocar no
+ * que importa. O que muda e a licao.
+ */
+import type { Difficulty } from './scoring.ts'
+
+/* ================================================================= SUPORTE
+   Mecanica: os chamados abertos viram balizas de luz no chao da fabrica.
+   O jogador toca NA ORDEM DE URGENCIA.
+
+   Por que em 3D e nao em cartao: aqui o LUGAR e informacao. Uma maquina
+   parada no meio da linha de producao pesa diferente de um mouse com defeito
+   no escritorio, e ver os dois no mapa torna isso obvio sem explicar.
+
+   Zero conhecimento tecnico: o texto do chamado diz o estrago.
+   ========================================================================= */
+
+export interface Incidente {
+  id: string
+  texto: string
+  setor: string
+  /** Posicao no chao da fabrica. */
+  x: number
+  z: number
+  /** 1 atende agora, 2 atende hoje, 3 pode esperar. */
+  urgencia: 1 | 2 | 3
+  why: string
+}
+
+export interface SuporteCase {
+  difficulty: Difficulty
+  label: string
+  question: string
+  incidentes: Incidente[]
+}
+
+export const SUPORTE_CASES: SuporteCase[] = [
+  {
+    difficulty: 'medio',
+    label: 'Fila da manhã',
+    question: 'Três chamados abertos ao mesmo tempo. Toque na ordem de atendimento.',
+    incidentes: [
+      {
+        id: 'a', texto: 'Linha 2 parada: coletor não lê etiqueta', setor: 'Produção',
+        x: 1.8, z: -2.4, urgencia: 1,
+        why: 'Linha de produção parada custa dinheiro por minuto. Vem sempre primeiro.',
+      },
+      {
+        id: 'b', texto: 'Impressora do faturamento saindo borrada', setor: 'Escritório',
+        x: -4.0, z: -2.8, urgencia: 2,
+        why: 'Atrapalha e atrasa a emissão, mas existe outra impressora para contornar.',
+      },
+      {
+        id: 'c', texto: 'Pedido de mousepad novo', setor: 'Escritório',
+        x: -4.2, z: 2.6, urgencia: 3,
+        why: 'Solicitação sem urgência nenhuma. Entra na fila normal.',
+      },
+    ],
+  },
+  {
+    difficulty: 'dificil',
+    label: 'Tudo ao mesmo tempo',
+    question: 'Cinco chamados. Toque do mais urgente ao menos urgente.',
+    incidentes: [
+      {
+        id: 'a', texto: 'Alguém clicou em link suspeito e digitou a senha', setor: 'Escritório',
+        x: -3.6, z: -3.2, urgencia: 1,
+        why: 'Suspeita de senha vazada é emergência, mesmo sem prejuízo visível ainda. Cada minuto conta.',
+      },
+      {
+        id: 'b', texto: 'Expedição inteira sem sistema: nada sai', setor: 'Expedição',
+        x: 4.6, z: 2.8, urgencia: 1,
+        why: 'Um setor inteiro impedido de trabalhar, com caminhão parado no pátio.',
+      },
+      {
+        id: 'c', texto: 'Balança da linha 1 desconectando sozinha', setor: 'Produção',
+        x: 0.8, z: -1.2, urgencia: 2,
+        why: 'Atrapalha bastante, mas a pesagem ainda pode ser feita manualmente.',
+      },
+      {
+        id: 'd', texto: 'Computador do RH muito lento', setor: 'Escritório',
+        x: -4.4, z: 1.0, urgencia: 2,
+        why: 'Reduz produtividade de uma pessoa, sem impedir o trabalho.',
+      },
+      {
+        id: 'e', texto: 'Trocar o papel de parede da recepção', setor: 'Recepção',
+        x: -1.0, z: 4.0, urgencia: 3,
+        why: 'Estético. Não afeta trabalho nenhum.',
+      },
+    ],
+  },
+]
+
+/* =============================================================== SEGURANCA
+   Mecanica: um globo com os acessos chegando a empresa. O jogador gira e
+   toca no acesso invasor.
+
+   A pista e VIAGEM IMPOSSIVEL: a mesma pessoa aparece logada em dois lugares
+   distantes com poucos minutos de diferenca. Ninguem precisa saber nada de
+   seguranca para entender que uma pessoa nao vai de Joinville a Kiev em
+   quarenta minutos.
+
+   E o metodo de deteccao que se usa de verdade. So que aqui da para ver.
+   ========================================================================= */
+
+export interface Acesso {
+  id: string
+  usuario: string
+  cidade: string
+  /** Graus. Usados para posicionar o ponto no globo. */
+  lat: number
+  lon: number
+  /** Horario do acesso, em minutos desde a meia-noite. */
+  hora: number
+  invasor?: boolean
+  why?: string
+}
+
+export interface SegurancaCase {
+  difficulty: Difficulty
+  label: string
+  question: string
+  acessos: Acesso[]
+}
+
+const hm = (h: number, m: number) => h * 60 + m
+
+export const SEGURANCA_CASES: SegurancaCase[] = [
+  {
+    difficulty: 'dificil',
+    label: 'Acesso de fora',
+    question: 'Um destes acessos não é de quem diz ser.',
+    acessos: [
+      { id: '1', usuario: 'CARLOS M.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(8, 12) },
+      { id: '2', usuario: 'MARIA S.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(8, 31) },
+      { id: '3', usuario: 'CARLOS M.', cidade: 'São Paulo, SP', lat: -23.5, lon: -46.6, hora: hm(14, 5) },
+      {
+        id: '4', usuario: 'MARIA S.', cidade: 'Kiev, Ucrânia', lat: 50.4, lon: 30.5, hora: hm(9, 6),
+        invasor: true,
+        why: 'MARIA S. entrou de Joinville às 08:31 e reaparece em Kiev às 09:06. Ninguém atravessa o mundo em 35 minutos: a senha dela vazou.',
+      },
+      { id: '5', usuario: 'ANA P.', cidade: 'Curitiba, PR', lat: -25.4, lon: -49.3, hora: hm(9, 40) },
+    ],
+  },
+  {
+    difficulty: 'critico',
+    label: 'Madrugada suspeita',
+    question: 'Dois acessos não deveriam existir. Ache os dois.',
+    acessos: [
+      { id: '1', usuario: 'CARLOS M.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(7, 55) },
+      {
+        id: '2', usuario: 'CARLOS M.', cidade: 'Lagos, Nigéria', lat: 6.5, lon: 3.4, hora: hm(8, 20),
+        invasor: true,
+        why: 'CARLOS M. estava em Joinville 25 minutos antes. Dois continentes na mesma manhã não existe.',
+      },
+      { id: '3', usuario: 'ANA P.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(9, 10) },
+      { id: '4', usuario: 'MARIA S.', cidade: 'São Paulo, SP', lat: -23.5, lon: -46.6, hora: hm(10, 2) },
+      {
+        id: '5', usuario: 'ADMIN', cidade: 'Hanói, Vietnã', lat: 21.0, lon: 105.8, hora: hm(3, 14),
+        invasor: true,
+        why: 'Conta de administrador, às 03:14 da manhã, do outro lado do mundo. Nenhuma das três coisas combina com a rotina da fábrica.',
+      },
+      { id: '6', usuario: 'JOÃO R.', cidade: 'Blumenau, SC', lat: -26.9, lon: -49.1, hora: hm(11, 25) },
+    ],
+  },
+]
+
+/** A sede, onde todos os acessos chegam. Joinville, no mapa. */
+export const SEDE = { lat: -26.3, lon: -48.8, nome: 'PLASTIREAL' }
+
+export const relogio = (min: number) =>
+  String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0')
+
+/**
+ * Distancia aproximada entre dois pontos do globo, em quilometros.
+ * Serve para o jogo explicar por que aquele par e impossivel, com numero
+ * em vez de adjetivo.
+ */
+export function distanciaKm(a: { lat: number; lon: number }, b: { lat: number; lon: number }): number {
+  const R = 6371
+  const rad = (d: number) => (d * Math.PI) / 180
+  const dLat = rad(b.lat - a.lat)
+  const dLon = rad(b.lon - a.lon)
+  const h = Math.sin(dLat / 2) ** 2
+    + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2
+  return Math.round(2 * R * Math.asin(Math.sqrt(h)))
+}

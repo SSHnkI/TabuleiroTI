@@ -1,0 +1,268 @@
+@import "./fonts.css";
+@import "tailwindcss";
+
+/* ==========================================================================
+   MISSAO TI :: tokens
+   Paleta ancorada na marca Plastireal, lida das variaveis CSS do site:
+     --main #2f337d  --main-strong #161a56  --secondary #5aabc7
+     alerta #ff3f2e  fonte Poppins
+   Direcao: ctOS de Watch Dogs, ou seja, interface de dados sobreposta ao
+   mundo real. O fundo NAO e preto, e o indigo profundo da marca: e isso que
+   separa "sistema tecnologico" de "site cyberpunk generico".
+   Regra de uso: ciano e o sistema, ambar e a ameaca, amarelo e a recompensa,
+   verde so confirma, vermelho so pune. Nunca dois acentos disputando a tela.
+   ========================================================================== */
+@theme {
+  /* Escala derivada do indigo da marca, nao do preto. */
+  --color-ink-900: #04050F;
+  --color-ink-800: #080B1E;
+  --color-ink-700: #0E1330;
+  --color-ink-600: #161A56;   /* --main-strong da Plastireal */
+  --color-ink-500: #2F337D;   /* --main da Plastireal */
+
+  /* O ciano da marca (--secondary #5aabc7) tem a mesma matiz do ciano de
+     interface, so menos saturada. Aqui ele aparece nas duas intensidades. */
+  --color-cyan-bright: #8FE3FF;
+  --color-cyan-core:   #21C8F6;
+  --color-cyan-brand:  #5AABC7;
+  --color-cyan-deep:   #1A6F94;
+
+  --color-signal-green:  #25DFA0;
+  --color-signal-red:    #FF3F2E;   /* o vermelho do proprio site */
+  --color-signal-amber:  #FF9F2E;   /* ameaca: a cor hostil do ctOS */
+  --color-signal-yellow: #FFD33D;
+
+  --color-label: #9FB8D4;
+  --color-micro: #5F7599;
+
+  --font-display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* Camadas de profundidade (L0..L5) */
+  --z-backdrop: 0;
+  --z-core: 10;
+  --z-atmosphere: 20;
+  --z-content: 30;
+  --z-reaction: 40;
+  --z-cinematic: 50;
+}
+
+/* Vocabulario unico de movimento. Tudo no app usa estes tempos. */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-tap: 120ms;
+  --dur-state: 240ms;
+  --dur-enter: 400ms;
+  --dur-cinematic: 900ms;
+
+  /* Glow: sempre CSS, nunca postprocessing de WebGL.
+     E a decisao que viabiliza o nucleo 3D em video integrado. */
+  --glow-cyan: 0 0 24px rgba(33, 200, 246, 0.38), 0 0 64px rgba(33, 200, 246, 0.14);
+  --glow-green: 0 0 24px rgba(37, 223, 160, 0.4), 0 0 64px rgba(37, 223, 160, 0.14);
+  --glow-red: 0 0 24px rgba(255, 63, 46, 0.42), 0 0 64px rgba(255, 63, 46, 0.15);
+  --glow-amber: 0 0 24px rgba(255, 159, 46, 0.42), 0 0 64px rgba(255, 159, 46, 0.15);
+  --glow-yellow: 0 0 28px rgba(255, 211, 61, 0.45), 0 0 72px rgba(255, 211, 61, 0.16);
+
+  /* Canto chanfrado dos paineis. E a forma que o ctOS usa no lugar do
+     retangulo de dashboard: bastam 14px para o painel deixar de parecer card. */
+  --notch: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+
+/* ==========================================================================
+   KIOSK HARDENING
+   Cada linha aqui corresponde a um "erro de interacao" relatado na edicao
+   anterior. Nao remover sem testar no monitor touch.
+   ========================================================================== */
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    background: var(--color-ink-900);
+    color: #EEF8FF;
+  }
+
+  html, body {
+    touch-action: manipulation;        /* mata zoom por duplo toque */
+    overscroll-behavior: none;         /* mata pull-to-refresh e bounce */
+    overflow: hidden;                  /* kiosk nao rola */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  /* Nada no app e selecionavel: arrastar o dedo nao pode selecionar texto */
+  * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Excecao: campos de texto do painel do operador precisam funcionar */
+  input, textarea {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Numeros tabulares em todo lugar: sem isto, um contador animado treme */
+  .tnum, output, time, [data-numeric] {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  button { cursor: pointer; font: inherit; color: inherit; }
+
+  /* Alvo minimo de toque. Dedo grosso, tela engordurada, pessoa em pe. */
+  [data-touch-target] { min-height: 72px; }
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   Aceternity Spotlight exige estes dois colados a mao no CSS global.
+   ========================================================================== */
+@keyframes spotlight {
+  0%   { opacity: 0; transform: translate(-72%, -62%) scale(0.5); }
+  100% { opacity: 1; transform: translate(-50%, -40%) scale(1); }
+}
+
+@keyframes cell-ripple {
+  0%   { background-color: color-mix(in oklab, var(--color-cyan-core) 40%, transparent); }
+  100% { background-color: transparent; }
+}
+
+@theme inline {
+  --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
+  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1 var(--delay, 0ms);
+}
+
+/* Pulso lento, usado em indicadores de atividade do HUD */
+@keyframes hud-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+/* Varredura de scanner */
+@keyframes scanline-sweep {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Shake de erro. Curto e seco: consequencia, nao decoracao. */
+@keyframes fx-shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  15% { transform: translate3d(-8px, 2px, 0); }
+  30% { transform: translate3d(7px, -2px, 0); }
+  45% { transform: translate3d(-5px, 1px, 0); }
+  60% { transform: translate3d(4px, -1px, 0); }
+  80% { transform: translate3d(-2px, 0, 0); }
+}
+
+/* Glitch de um quadro. Diz "erro" melhor que meio segundo de animacao. */
+@keyframes fx-glitch {
+  0%, 100% { clip-path: inset(0 0 0 0); transform: translate3d(0,0,0); filter: none; }
+  20% { clip-path: inset(18% 0 42% 0); transform: translate3d(-6px,0,0); filter: hue-rotate(-25deg); }
+  40% { clip-path: inset(62% 0 8% 0);  transform: translate3d(5px,0,0);  filter: hue-rotate(18deg); }
+  60% { clip-path: inset(32% 0 55% 0); transform: translate3d(-3px,0,0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ==========================================================================
+   CAMADA ctOS
+   Scanline e ruido finissimos sobre a tela inteira. E o que faz a interface
+   parecer projetada sobre o ambiente, em vez de desenhada numa pagina.
+   Sao pseudo-elementos fixos, sem custo de JavaScript e sem laco de animacao.
+   ========================================================================== */
+.ctos-scan {
+  position: fixed;
+  inset: 0;
+  z-index: 44;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(143, 227, 255, 0.028) 0px,
+    rgba(143, 227, 255, 0.028) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+}
+
+/* Moldura do sistema: quatro cantoneiras na borda da TELA, nao do card.
+   E a assinatura visual do ctOS, e da a sensacao de estar dentro de um
+   equipamento em vez de dentro de um site. */
+/* Janela para o ambiente 3D.
+   O canvas ocupa uma coluna da grade, entao a borda dele existe de qualquer
+   jeito. Em vez de tentar disfarcar, a borda virou moldura: o cenario passa a
+   ser a imagem de uma camera na fabrica, e o chao pode dissolver dentro dela
+   sem deixar emenda contra o fundo da pagina.
+   O degrade e o azul da marca, nunca preto. */
+.sala-3d {
+  background:
+    radial-gradient(130% 95% at 50% 102%,
+      color-mix(in oklab, var(--color-ink-600) 62%, transparent) 0%,
+      transparent 60%),
+    linear-gradient(180deg, var(--color-ink-800) 0%, var(--color-ink-700) 100%);
+  border: 1px solid color-mix(in oklab, var(--color-cyan-core) 15%, transparent);
+  box-shadow: inset 0 40px 90px rgba(4, 5, 15, 0.55);
+  clip-path: var(--notch);
+  overflow: hidden;
+}
+
+.ctos-frame {
+  position: fixed;
+  inset: 14px;
+  z-index: 43;
+  pointer-events: none;
+}
+.ctos-frame::before,
+.ctos-frame::after {
+  content: "";
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  border-color: color-mix(in oklab, var(--color-cyan-core) 55%, transparent);
+}
+.ctos-frame::before {
+  top: 0; left: 0;
+  border-top: 2px solid; border-left: 2px solid;
+  box-shadow: -1px -1px 16px rgba(33, 200, 246, 0.25);
+}
+.ctos-frame::after {
+  bottom: 0; right: 0;
+  border-bottom: 2px solid; border-right: 2px solid;
+  box-shadow: 1px 1px 16px rgba(33, 200, 246, 0.25);
+}
+
+/* Pulso de dados percorrendo a borda superior: o sinal de que o sistema
+   esta vivo, no lugar onde nao atrapalha leitura nenhuma. */
+@keyframes ctos-uplink {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { transform: translateX(100vw); opacity: 0; }
+}
+.ctos-uplink {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 180px;
+  z-index: 43;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--color-cyan-bright), transparent);
+  animation: ctos-uplink 7s linear infinite;
+}

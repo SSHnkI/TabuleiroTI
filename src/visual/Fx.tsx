@@ -320,7 +320,7 @@ export function FxProvider({ children }: { children: ReactNode }) {
               <span
                 className="tnum"
                 style={{
-                  fontSize: 30, fontWeight: 700,
+                  fontSize: 'clamp(14px, 3.73vw, 30px)', fontWeight: 700,
                   color: 'var(--color-signal-yellow)',
                   textShadow: 'var(--glow-yellow)',
                 }}
@@ -340,7 +340,7 @@ export function FxProvider({ children }: { children: ReactNode }) {
               className="tnum absolute"
               style={{
                 left: f.x, top: f.y,
-                fontSize: 34, fontWeight: 700,
+                fontSize: 'clamp(15px, 4vw, 34px)', fontWeight: 700,
                 color: f.kind === 'good' ? 'var(--color-signal-yellow)' : 'var(--color-signal-red)',
                 textShadow: f.kind === 'good' ? 'var(--glow-yellow)' : 'var(--glow-red)',
                 translate: '-50% -50%',

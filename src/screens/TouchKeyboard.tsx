@@ -114,7 +114,7 @@ export function TouchKeyboard({ count, onDone, onBack }: {
             />
             <div
               className="min-h-[48px] min-w-0 flex-1 truncate"
-              style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 40, letterSpacing: '.04em' }}
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(18px, 4.8vw, 40px)', letterSpacing: '.04em' }}
             >
               {current.name || <span style={{ color: 'var(--color-micro)' }}>digite seu nome</span>}
             </div>

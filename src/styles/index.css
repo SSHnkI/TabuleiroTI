@@ -266,3 +266,71 @@
   background: linear-gradient(90deg, transparent, var(--color-cyan-bright), transparent);
   animation: ctos-uplink 7s linear infinite;
 }
+
+/* ==================================================================== CELULAR
+   O estande e um monitor de 24 polegadas deitado, 1920x1080. Celular em pe e
+   outra coisa: 390 de largura, 844 de altura.
+
+   Nada aqui vale acima de 1024px, entao o estande continua exatamente igual.
+   Abaixo disso: as colunas empilham (os grid-cols-1 nos desafios) e a pagina
+   volta a rolar, porque conteudo empilhado nao cabe numa tela de celular.
+
+   A rolagem e o unico ponto em que o modo quiosque cede. Continua sem
+   pull-to-refresh e sem zoom por duplo toque: o que muda e so poder alcancar
+   o que ficou embaixo. */
+@media (max-width: 1023px) {
+  html, body {
+    overflow: auto;
+    height: auto;
+    min-height: 100%;
+  }
+
+  #root {
+    height: auto;
+    min-height: 100dvh;
+  }
+
+  /* Os containers de tela usam h-full, que dentro de um pai de altura
+     automatica vira zero. Aqui eles passam a ter altura minima de tela e
+     crescem com o conteudo. */
+  #root main,
+  #root main > div {
+    height: auto !important;
+    min-height: 100dvh;
+    overflow: visible !important;
+  }
+
+  /* A moldura de cantos e o pulso de dados sao decoracao de tela grande.
+     Num celular eles brigam com a barra do sistema. */
+  .ctos-frame,
+  .ctos-uplink {
+    display: none;
+  }
+
+  /* Alvo de toque continua grande, mas 72px de altura em tela de 844
+     empilha rapido demais. 60 ainda e folgado para dedo (16mm). */
+  [data-touch-target] {
+    min-height: 60px;
+  }
+}
+
+/* Celular DEITADO: pouca altura, muita largura. Aqui o problema e o oposto,
+   sobra largura e falta altura, entao o 3D encolhe em vez de empurrar tudo
+   para fora da tela. */
+@media (max-width: 1023px) and (orientation: landscape) {
+  #root main,
+  #root main > div {
+    min-height: 100dvh;
+  }
+}
+
+/* Filho de grid e de flex nasce com min-width:auto, entao UM botao largo
+   empurra a tela inteira para fora em celular. Aqui todo mundo pode encolher.
+   Vale so abaixo de 1024px: no estande as larguras sao intencionais. */
+@media (max-width: 1023px) {
+  #root main,
+  #root main * {
+    min-width: 0;
+    max-width: 100%;
+  }
+}

@@ -46,13 +46,13 @@ export function TvBoard() {
   const duelKing = duelBoard(duels)[0]
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto] px-14 py-10">
+    <div className="grid h-full grid-rows-[auto_1fr_auto] px-4 lg:px-14 py-10">
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Radio size={30} style={{ color: 'var(--color-signal-red)' }} className="animate-pulse" />
           <div>
             <HudLabel>Ao vivo do estande de TI</HudLabel>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 44 }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(20px, 5.33vw, 44px)' }}>
               MISSÃO <span style={{ color: 'var(--color-cyan-core)' }}>TI</span>
             </h1>
           </div>
@@ -76,7 +76,7 @@ export function TvBoard() {
             className="space-y-3"
           >
             {rows.length === 0 && (
-              <li className="text-center" style={{ fontSize: 34, color: 'var(--color-micro)' }}>
+              <li className="text-center" style={{ fontSize: 'clamp(15px, 4vw, 34px)', color: 'var(--color-micro)' }}>
                 Ninguém jogou ainda.<br />Seja o primeiro do dia.
               </li>
             )}
@@ -95,18 +95,18 @@ export function TvBoard() {
                 <span
                   className="tnum w-14 shrink-0 text-center"
                   style={{
-                    fontSize: 46,
+                    fontSize: 'clamp(21px, 5.6vw, 46px)',
                     color: i < 3 ? 'var(--color-signal-yellow)' : 'var(--color-micro)',
                   }}
                 >
                   {i + 1}
                 </span>
                 {i === 0 && <Crown size={38} style={{ color: 'var(--color-signal-yellow)' }} />}
-                <span className="min-w-0 flex-1 truncate" style={{ fontSize: 40 }}>{r.name}</span>
+                <span className="min-w-0 flex-1 truncate" style={{ fontSize: 'clamp(18px, 4.8vw, 40px)' }}>{r.name}</span>
                 <span
                   className="tnum shrink-0"
                   style={{
-                    fontSize: 52,
+                    fontSize: 'clamp(23px, 6.13vw, 52px)',
                     color: i === 0 ? 'var(--color-signal-yellow)' : '#EAFBFF',
                   }}
                 >
@@ -156,7 +156,7 @@ export function TvBoard() {
           <div className="min-w-0">
             <HudLabel className="mb-1">Campeão de duelos</HudLabel>
             {duelKing ? (
-              <p className="truncate" style={{ fontSize: 30 }}>
+              <p className="truncate" style={{ fontSize: 'clamp(14px, 3.73vw, 30px)' }}>
                 <b>{duelKing.name}</b>
                 <span className="tnum" style={{ color: 'var(--color-signal-yellow)' }}>
                   {' '}{duelKing.wins}
@@ -181,7 +181,7 @@ function Big({ label, value, tone = '#EAFBFF' }: { label: string; value: number;
   return (
     <Panel className="px-7 py-5">
       <HudLabel className="mb-1">{label}</HudLabel>
-      <div className="tnum leading-none" style={{ fontSize: 72, color: tone }}>
+      <div className="tnum leading-none" style={{ fontSize: 'clamp(32px, 8.53vw, 72px)', color: tone }}>
         <NumberTicker value={value} startOnView={false} />
       </div>
     </Panel>

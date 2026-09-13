@@ -64,7 +64,7 @@ export function Phishing({ email, secondsLeft, onDone, onPenalty }: {
   }
 
   return (
-    <div className="grid h-full grid-cols-[1.3fr_.7fr] items-center gap-10 px-12 pb-8">
+    <div className="grid h-full grid-cols-1 items-center gap-4 px-4 pb-4 lg:grid-cols-[1.3fr_.7fr] lg:gap-10 lg:px-12 lg:pb-8">
       {/* ---------------------------------------------------------- o e-mail */}
       <Panel className="p-7" tone="cyan">
         <div className="mb-4 flex items-center justify-between">

@@ -23,13 +23,13 @@ export function Ranking({ runs, highlightAt, onBack }: {
   const s = stats(runs)
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto] px-12 py-7">
+    <div className="grid h-full grid-rows-[auto_1fr_auto] px-4 lg:px-12 py-7">
       <header className="mb-5 flex items-end justify-between">
         <div>
           <HudLabel className="mb-1">Placar do dia</HudLabel>
           <h1
             className="uppercase"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(28px,3.6vw,46px)' }}
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(21px, 3.6vw, 46px)' }}
           >
             RANKING
           </h1>

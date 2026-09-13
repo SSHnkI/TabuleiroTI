@@ -93,7 +93,7 @@ export function Fluxo({ flow, secondsLeft, onDone, onPenalty }: {
   const hint = steps[nextOrder]?.hint
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr] px-12 pb-8">
+    <div className="grid h-full grid-rows-[auto_1fr] px-4 lg:px-12 pb-8">
       <div className="flex items-center justify-between pb-2">
         <div className="flex items-center gap-3">
           <Workflow size={26} strokeWidth={1.5} style={{ color: 'var(--color-cyan-core)' }} />

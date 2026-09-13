@@ -139,7 +139,7 @@ export function Play({ state, onDone, onPenalty, onPause }: {
             transition={{ duration: 0.22 }}
           >
             <motion.div
-              className="w-full px-16 text-center"
+              className="w-full px-4 lg:px-16 text-center"
               initial={{ scale: 0.85, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 260, damping: 22 }}
@@ -158,7 +158,7 @@ export function Play({ state, onDone, onPenalty, onPause }: {
                 className="uppercase"
                 style={{
                   fontFamily: 'var(--font-display)', fontWeight: 700,
-                  fontSize: 'clamp(56px,9vw,130px)', lineHeight: 1,
+                  fontSize: 'clamp(34px, 9vw, 130px)', lineHeight: 1,
                   color: player.color,
                   textShadow: '0 0 60px ' + player.color + '90',
                 }}

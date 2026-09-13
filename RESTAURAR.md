@@ -60,6 +60,7 @@ Para voltar a qualquer uma delas, troque `ponto-zero` pelo nome da marca no coma
 | `ponto-zero` | O estado descrito acima. O chao seguro. |
 | `fase2-som-e-impacto` | Som de arcade (ruido, impacto, explosao, combo, ambiente), congelamento de quadro, tranco de camera, tremor e destrocos em voxel nas 5 cenas 3D. 66 testes. |
 | `fase2-impacto-em-todos` | O mesmo impacto nos 12 desafios: estilhaco no ponto do dedo, onda de choque, selo de sequencia e leito de som tambem nos 7 que vivem no DOM. |
+| `fase2-pwa-e-celular` | Instalavel no celular (manifest, icones, service worker) e layout que empilha abaixo de 1024px. O estande em 1920x1080 nao muda em nada. |
 
 ---
 

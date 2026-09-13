@@ -171,7 +171,7 @@ export function Firewall({ drops, speed, secondsLeft, onDone, onPenalty }: {
   const health = Math.max(0, lives / FIREWALL_LIVES)
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto] px-12 pb-6">
+    <div className="grid h-full grid-rows-[auto_1fr_auto] px-4 lg:px-12 pb-6">
       <div className="flex items-center justify-between pb-3">
         <div className="flex items-center gap-3">
           <ShieldAlert size={26} strokeWidth={1.5} style={{ color: 'var(--color-signal-red)' }} />

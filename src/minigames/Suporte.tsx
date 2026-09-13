@@ -367,8 +367,8 @@ export function Suporte({ chamados, secondsLeft, onDone, onPenalty }: {
   }, [chamados])
 
   return (
-    <div className="grid h-full grid-cols-[1fr_310px] gap-8 px-10 pb-6">
-      <div ref={labelBox} className="sala-3d relative min-h-0">
+    <div className="grid h-full grid-cols-1 gap-4 px-4 pb-4 lg:grid-cols-[1fr_310px] lg:gap-8 lg:px-10 lg:pb-6">
+      <div ref={labelBox} className="sala-3d relative min-h-[46vh] lg:min-h-0">
         <div ref={hostRef} className="absolute inset-0" />
 
         {/* Rotulos: o texto do chamado fica ancorado na baliza dele. Tocar

@@ -4,7 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#04050F">
 <title>MISSAO TI</title>
+
+<!-- Instalavel no celular. O estande nao precisa disto (roda em localhost pelo
+     INICIAR-ESTANDE.bat), mas quem abrir o link pode guardar na tela inicial e
+     jogar sem internet depois da primeira visita. -->
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icone-192.png">
+<!-- O iOS nao le o manifest para o icone da tela inicial: quer a tag propria. -->
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MISSÃO TI">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
 <div id="root"></div>

@@ -66,7 +66,7 @@ export function Triagem({ tickets, secondsLeft, onDone, onPenalty }: {
   }
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto] px-12 pb-8">
+    <div className="grid h-full grid-rows-[auto_1fr_auto] px-4 lg:px-12 pb-8">
       <div className="flex items-center justify-between pb-3">
         <div className="flex items-center gap-3">
           <Inbox size={26} strokeWidth={1.5} style={{ color: 'var(--color-cyan-core)' }} />
@@ -92,9 +92,9 @@ export function Triagem({ tickets, secondsLeft, onDone, onPenalty }: {
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               className="w-full max-w-3xl"
             >
-              <Panel className="px-10 py-9" tone={feedback ? (feedback.ok ? 'green' : 'red') : 'cyan'}>
+              <Panel className="px-4 lg:px-10 py-9" tone={feedback ? (feedback.ok ? 'green' : 'red') : 'cyan'}>
                 <HudLabel className="mb-3">Chamado aberto agora</HudLabel>
-                <p style={{ fontSize: 30, lineHeight: 1.3 }}>{ticket.text}</p>
+                <p style={{ fontSize: 'clamp(14px, 3.73vw, 30px)', lineHeight: 1.3 }}>{ticket.text}</p>
 
                 <AnimatePresence>
                   {feedback && (

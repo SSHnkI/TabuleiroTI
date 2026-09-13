@@ -102,7 +102,7 @@ export function Backup({ length, secondsLeft, onDone, onPenalty }: {
     : 'Agora repita, na mesma ordem'
 
   return (
-    <div className="grid h-full grid-rows-[auto_auto_1fr] px-12 pb-8">
+    <div className="grid h-full grid-rows-[auto_auto_1fr] px-4 lg:px-12 pb-8">
       <div className="flex items-center justify-between pb-3">
         <div className="flex items-center gap-3">
           <HardDriveDownload size={26} strokeWidth={1.5} style={{ color: 'var(--color-cyan-core)' }} />

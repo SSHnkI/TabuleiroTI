@@ -40,7 +40,7 @@ export function Attract({ runs, onStart }: { runs: Run[]; onStart: () => void })
   }, [slides.length])
 
   return (
-    <div className="relative grid h-full w-full grid-rows-[auto_1fr_auto] px-10 py-7">
+    <div className="relative grid h-full w-full grid-rows-[auto_1fr_auto] px-4 py-4 lg:px-10 lg:py-7">
       {/* ---------------------------------------------------- faixa superior */}
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -53,7 +53,7 @@ export function Attract({ runs, onStart }: { runs: Run[]; onStart: () => void })
       {/* ------------------------------------------------------------ centro */}
       {/* min-w-0: sem isto o titulo gigante recusa encolher e empurra a coluna
           do ranking para fora da tela. Filho de grid tem min-width:auto por padrao. */}
-      <section className="grid min-h-0 grid-cols-[1.15fr_.85fr] items-center gap-14">
+      <section className="grid min-h-0 grid-cols-1 items-center gap-6 lg:grid-cols-[1.15fr_.85fr] lg:gap-14">
         <div className="min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -64,7 +64,7 @@ export function Attract({ runs, onStart }: { runs: Run[]; onStart: () => void })
 
             <h1
               className="leading-[0.88]"
-              style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(56px, 9vw, 132px)' }}
+              style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(34px, 9vw, 132px)' }}
             >
               <span style={{ color: '#EAFBFF' }}>MISSÃO</span>{' '}
               <span style={{ color: 'var(--color-cyan-core)', textShadow: 'var(--glow-cyan)' }}>TI</span>
@@ -73,7 +73,7 @@ export function Attract({ runs, onStart }: { runs: Run[]; onStart: () => void })
             <div
               className="mt-3"
               style={{
-                fontFamily: 'var(--font-mono)', fontSize: 'clamp(18px, 2.2vw, 30px)',
+                fontFamily: 'var(--font-mono)', fontSize: 'clamp(14px, 2.2vw, 30px)',
                 letterSpacing: '.22em', color: 'var(--color-label)',
               }}
             >

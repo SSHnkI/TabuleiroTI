@@ -554,9 +554,9 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
   const sel = selected != null ? rack.units[selected] : null
 
   return (
-    <div className="grid h-full grid-cols-[1fr_340px] gap-8 px-10 pb-6">
+    <div className="grid h-full grid-cols-1 gap-4 px-4 pb-4 lg:grid-cols-[1fr_340px] lg:gap-8 lg:px-10 lg:pb-6">
       {/* --------------------------------------------------------- o rack 3D */}
-      <div className="sala-3d relative min-h-0">
+      <div className="sala-3d relative min-h-[46vh] lg:min-h-0">
         <div ref={hostRef} className="absolute inset-0" />
 
         {/* Affordance de giro. Some assim que a pessoa gira. */}

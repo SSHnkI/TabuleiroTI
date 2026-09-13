@@ -69,8 +69,8 @@ export function Result({ score, results, teamName, position, total, training, on
   const show = (n: number) => (stage >= n ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 })
 
   return (
-    <div className="relative grid h-full grid-rows-[1fr_auto] px-12 py-8">
-      <div className="grid grid-cols-[1.05fr_.95fr] items-center gap-14">
+    <div className="relative grid h-full grid-rows-[1fr_auto] px-4 py-4 lg:px-12 lg:py-8">
+      <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[1.05fr_.95fr] lg:gap-14">
         {/* ------------------------------------------------- numero principal */}
         <div className="text-center">
           <motion.div animate={show(1)} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>
@@ -83,7 +83,7 @@ export function Result({ score, results, teamName, position, total, training, on
               className="uppercase"
               style={{
                 fontFamily: 'var(--font-display)', fontWeight: 700,
-                fontSize: 'clamp(32px,4.6vw,58px)', letterSpacing: '.04em',
+                fontSize: 'clamp(26px, 4.6vw, 58px)', letterSpacing: '.04em',
               }}
             >
               MISSÃO CONCLUÍDA
@@ -96,7 +96,7 @@ export function Result({ score, results, teamName, position, total, training, on
             transition={{ type: 'spring', stiffness: 220, damping: 20 }}
             className="tnum my-2 leading-none"
             style={{
-              fontSize: 'clamp(110px,15vw,200px)',
+              fontSize: 'clamp(34px, 15vw, 200px)',
               color: 'var(--color-signal-yellow)',
               textShadow: '0 0 40px rgba(255,211,61,.5), 0 0 120px rgba(255,211,61,.2)',
             }}
@@ -118,7 +118,7 @@ export function Result({ score, results, teamName, position, total, training, on
               <p
                 className="uppercase"
                 style={{
-                  fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 30,
+                  fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(14px, 3.73vw, 30px)',
                   color: position <= 3 ? 'var(--color-signal-yellow)' : '#EAFBFF',
                   textShadow: position <= 3 ? 'var(--glow-yellow)' : 'none',
                 }}

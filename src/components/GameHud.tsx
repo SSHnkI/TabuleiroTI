@@ -57,11 +57,11 @@ export function GameHud({
   const tone = TONE[spec.difficulty]
 
   return (
-    <header className="relative px-9 pt-6" style={{ zIndex: 35 }}>
-      <div className="flex items-start justify-between gap-8">
+    <header className="relative px-4 pt-4 lg:px-9 lg:pt-6" style={{ zIndex: 35 }}>
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3 lg:flex-nowrap lg:gap-8">
         {/* ------------------------------------------------ etapa e progresso */}
-        <div className="min-w-0 flex-1">
-          <div className="mb-1.5 flex items-center gap-3">
+        <div className="order-last w-full min-w-0 lg:order-none lg:w-auto lg:flex-1">
+          <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
             <HudLabel>Etapa {index + 1} de {round.length}</HudLabel>
 
             {/* Criticidade e valor lado a lado: a pessoa sabe na hora que
@@ -91,7 +91,7 @@ export function GameHud({
 
           <h2
             className="truncate uppercase"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 26, letterSpacing: '.06em' }}
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(18px, 5.2vw, 26px)', letterSpacing: '.06em' }}
           >
             {spec.label}
           </h2>
@@ -99,7 +99,7 @@ export function GameHud({
 
           <div className="mt-2.5 flex items-center gap-3">
             <HudLabel>Sistema restaurado</HudLabel>
-            <div className="relative h-1.5 w-52 overflow-hidden" style={{ background: 'rgba(21,199,255,.12)' }}>
+            <div className="relative h-1.5 w-full max-w-52 flex-1 overflow-hidden" style={{ background: 'rgba(21,199,255,.12)' }}>
               <motion.div
                 className="absolute inset-y-0 left-0"
                 style={{ background: 'var(--color-signal-green)', boxShadow: 'var(--glow-green)' }}
@@ -112,12 +112,12 @@ export function GameHud({
         </div>
 
         {/* ---------------------------------------------------------- relogio */}
-        <div className="text-center">
+        <div className="flex flex-1 items-center gap-3 lg:block lg:flex-none lg:text-center">
           <HudLabel className="mb-1">Tempo</HudLabel>
           <div
             className="tnum leading-none"
             style={{
-              fontSize: 56,
+              fontSize: 'clamp(25px, 6.67vw, 56px)',
               color: urgent ? 'var(--color-signal-red)' : '#EAFBFF',
               textShadow: urgent ? 'var(--glow-red)' : 'none',
               // Pulsa so quando aperta. Pulsar sempre nao avisaria nada.
@@ -126,7 +126,7 @@ export function GameHud({
           >
             {String(secondsLeft).padStart(2, '0')}
           </div>
-          <div className="relative mt-2 h-1 w-40 overflow-hidden" style={{ background: 'rgba(21,199,255,.12)' }}>
+          <div className="relative mt-2 hidden h-1 w-40 overflow-hidden lg:block" style={{ background: 'rgba(21,199,255,.12)' }}>
             <div
               className="absolute inset-y-0 left-0"
               style={{
@@ -139,7 +139,7 @@ export function GameHud({
         </div>
 
         {/* --------------------------------------------- jogador da vez e nota */}
-        <div className="min-w-[230px] text-right">
+        <div className="text-right lg:min-w-[230px]">
           {/* Bloco inteiro na cor do jogador, nao so um ponto colorido: num
               grupo de quatro, saber de quem e a vez precisa ser legivel de
               relance, por quem esta em pe atras da pessoa que joga. */}
@@ -176,7 +176,7 @@ export function GameHud({
           <HudLabel className="mb-1">Pontos</HudLabel>
           <div
             className="tnum leading-none"
-            style={{ fontSize: 46, color: 'var(--color-signal-yellow)', textShadow: 'var(--glow-yellow)' }}
+            style={{ fontSize: 'clamp(21px, 5.6vw, 46px)', color: 'var(--color-signal-yellow)', textShadow: 'var(--glow-yellow)' }}
           >
             <NumberTicker value={score} startOnView={false} />
           </div>

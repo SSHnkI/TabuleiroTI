@@ -79,7 +79,7 @@ export function Duelo({ players, onFinish, onAbort }: {
   return (
     <div className="relative grid h-full grid-rows-[auto_1fr]">
       {/* --------------------------------------------------------- placar */}
-      <header className="flex items-center justify-between px-10 pt-5">
+      <header className="flex items-center justify-between px-4 lg:px-10 pt-5">
         <SideScore player={players[0]} score={blocked[0]} align="left" />
         <div className="text-center">
           <div className="mb-1 flex items-center justify-center gap-2">
@@ -89,7 +89,7 @@ export function Duelo({ players, onFinish, onAbort }: {
           <div
             className="tnum leading-none"
             style={{
-              fontSize: 52,
+              fontSize: 'clamp(23px, 6.13vw, 52px)',
               color: left <= 5 ? 'var(--color-signal-red)' : '#EAFBFF',
               textShadow: left <= 5 ? 'var(--glow-red)' : 'none',
               animation: left <= 5 ? 'hud-pulse .7s infinite' : undefined,
@@ -142,7 +142,7 @@ export function Duelo({ players, onFinish, onAbort }: {
                 initial={{ scale: 2.2, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="tnum"
-                style={{ fontSize: 180, color: 'var(--color-cyan-bright)', textShadow: 'var(--glow-cyan)' }}
+                style={{ fontSize: 'clamp(34px, 21.6vw, 180px)', color: 'var(--color-cyan-bright)', textShadow: 'var(--glow-cyan)' }}
               >
                 {count === 0 ? 'JÁ' : count}
               </motion.div>
@@ -165,7 +165,7 @@ export function Duelo({ players, onFinish, onAbort }: {
             >
               {winner === null ? (
                 <>
-                  <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 70 }}>EMPATE</h2>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(32px, 8.53vw, 70px)' }}>EMPATE</h2>
                   <p className="mt-2 text-[22px]" style={{ color: 'var(--color-label)' }}>
                     {blocked[0]} a {blocked[1]}. Vão ter que desempatar.
                   </p>
@@ -177,7 +177,7 @@ export function Duelo({ players, onFinish, onAbort }: {
                   <h2
                     style={{
                       fontFamily: 'var(--font-display)', fontWeight: 700,
-                      fontSize: 'clamp(44px,7vw,92px)',
+                      fontSize: 'clamp(34px, 7vw, 92px)',
                       color: players[winner].color,
                       textShadow: '0 0 40px ' + players[winner].color + '80',
                     }}
@@ -214,7 +214,7 @@ function SideScore({ player, score, align }: {
       <HudLabel className="mb-1">{player.name}</HudLabel>
       <div
         className="tnum leading-none"
-        style={{ fontSize: 60, color: player.color, textShadow: '0 0 26px ' + player.color + '70' }}
+        style={{ fontSize: 'clamp(27px, 7.2vw, 60px)', color: player.color, textShadow: '0 0 26px ' + player.color + '70' }}
       >
         {score}
       </div>

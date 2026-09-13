@@ -32,11 +32,11 @@ export function Admin({ runs, perf, muted, onMute, onRuns, onClose }: {
   const health = storageHealth()
 
   return (
-    <div className="h-full overflow-y-auto px-10 py-7">
+    <div className="h-full overflow-y-auto px-4 py-4 lg:px-10 lg:py-7">
       <header className="mb-6 flex items-start justify-between">
         <div>
           <HudLabel className="mb-1">Uso interno</HudLabel>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 38 }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(17px, 4.53vw, 38px)' }}>
             PAINEL DO OPERADOR
           </h1>
         </div>
@@ -133,7 +133,7 @@ export function Admin({ runs, perf, muted, onMute, onRuns, onClose }: {
             <span
               className="tnum"
               style={{
-                fontSize: 56,
+                fontSize: 'clamp(25px, 6.67vw, 56px)',
                 color: perf.fps < 45 ? 'var(--color-signal-red)' : 'var(--color-signal-green)',
               }}
             >
@@ -184,7 +184,7 @@ function Metric({ label, value, tone = '#EAFBFF', sub }: {
   return (
     <Panel className="px-5 py-4">
       <HudLabel className="mb-1">{label}</HudLabel>
-      <div className="tnum text-[32px]" style={{ color: tone }}>{value}</div>
+      <div className="tnum text-[clamp(14px,3.73vw,32px)]" style={{ color: tone }}>{value}</div>
       {sub && <div className="tnum text-[13px]" style={{ color: 'var(--color-micro)' }}>{sub}</div>}
     </Panel>
   )
@@ -282,7 +282,7 @@ function TouchTest({ onClose }: { onClose: () => void }) {
       <div className="pointer-events-none absolute inset-x-0 top-16 text-center">
         <Gauge size={34} className="mx-auto mb-3" style={{ color: 'var(--color-cyan-core)' }} />
         <HudLabel className="mb-2">Teste de multi-toque</HudLabel>
-        <p className="tnum" style={{ fontSize: 78, color: 'var(--color-cyan-bright)' }}>{maxSeen}</p>
+        <p className="tnum" style={{ fontSize: 'clamp(35px, 9.33vw, 78px)', color: 'var(--color-cyan-bright)' }}>{maxSeen}</p>
         <p className="text-[17px]" style={{ color: 'var(--color-label)' }}>
           dedos reconhecidos ao mesmo tempo
         </p>

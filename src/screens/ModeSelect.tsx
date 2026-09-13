@@ -43,7 +43,7 @@ export function ModeSelect({ onPick, onBack }: {
   }
 
   return (
-    <div className="grid h-full place-items-center px-10">
+    <div className="grid h-full place-items-center px-4 lg:px-10">
       <div className="w-full max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ export function ModeSelect({ onPick, onBack }: {
           <HudLabel className="mb-3 text-center">Formação da equipe</HudLabel>
           <h2
             className="mb-10 text-center"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(30px,4.4vw,54px)' }}
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(24px, 4.4vw, 54px)' }}
           >
             QUANTOS VÃO JOGAR?
           </h2>
@@ -84,7 +84,7 @@ export function ModeSelect({ onPick, onBack }: {
                 <div
                   className="tnum leading-none"
                   style={{
-                    fontSize: 76,
+                    fontSize: 'clamp(34px, 9.07vw, 76px)',
                     color: active ? 'var(--color-cyan-bright)' : '#93B7CB',
                     textShadow: active ? 'var(--glow-cyan)' : 'none',
                   }}

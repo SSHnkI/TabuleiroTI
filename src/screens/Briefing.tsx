@@ -60,7 +60,7 @@ export function Briefing({ mode, players, onStart, onBack }: {
   ]
 
   return (
-    <div className="grid h-full place-items-center px-12">
+    <div className="grid h-full place-items-center px-4 lg:px-12">
       <motion.div
         className="w-full max-w-5xl"
         initial={{ opacity: 0, y: 18 }}
@@ -71,7 +71,7 @@ export function Briefing({ mode, players, onStart, onBack }: {
           <HudLabel className="mb-2">Instruções da missão</HudLabel>
           <h1
             className="uppercase"
-            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(30px,4.4vw,52px)' }}
+            style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(23px, 4.4vw, 52px)' }}
           >
             COMO FUNCIONA
           </h1>

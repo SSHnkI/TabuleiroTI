@@ -406,8 +406,8 @@ export function Rede({ net, secondsLeft, onDone, onPenalty }: {
   const causaLink = net.links.find(l => !l.ok && found.includes(l.to))
 
   return (
-    <div className="grid h-full grid-cols-[1fr_330px] gap-8 px-10 pb-6">
-      <div className="sala-3d relative min-h-0">
+    <div className="grid h-full grid-cols-1 gap-4 px-4 pb-4 lg:grid-cols-[1fr_330px] lg:gap-8 lg:px-10 lg:pb-6">
+      <div className="sala-3d relative min-h-[46vh] lg:min-h-0">
         <div ref={hostRef} className="absolute inset-0" />
 
         <div className="pointer-events-none absolute inset-x-0 bottom-1 flex flex-col items-center gap-2">

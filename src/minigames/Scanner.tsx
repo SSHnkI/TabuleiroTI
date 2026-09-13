@@ -61,7 +61,7 @@ export function Scanner({ erp, secondsLeft, onDone, onPenalty }: {
   }
 
   return (
-    <div className="grid h-full grid-cols-[1.25fr_.75fr] items-center gap-10 px-12 pb-10">
+    <div className="grid h-full grid-cols-1 items-center gap-4 px-4 pb-4 lg:grid-cols-[1.25fr_.75fr] lg:gap-10 lg:px-12 lg:pb-10">
       {/* ------------------------------------------------------ tela do ERP */}
       <Panel className="relative overflow-hidden p-8" tone="cyan">
         {/* Varredura continua. E o que diz "estamos procurando alguma coisa". */}
@@ -79,7 +79,7 @@ export function Scanner({ erp, secondsLeft, onDone, onPenalty }: {
             <HudLabel>{erp.screen}</HudLabel>
             <div
               className="tnum mt-1"
-              style={{ fontSize: 30, fontWeight: 700, color: '#EAFBFF' }}
+              style={{ fontSize: 'clamp(14px, 3.73vw, 30px)', fontWeight: 700, color: '#EAFBFF' }}
             >
               {erp.ref}
             </div>

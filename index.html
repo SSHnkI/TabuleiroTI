@@ -11,6 +11,9 @@
      INICIAR-ESTANDE.bat), mas quem abrir o link pode guardar na tela inicial e
      jogar sem internet depois da primeira visita. -->
 <link rel="manifest" href="./manifest.webmanifest">
+<!-- O navegador pede /favicon.ico sozinho, mesmo com o icone em png
+     declarado. Sem este arquivo sobram dois 404 no console. -->
+<link rel="icon" href="./favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icone-192.png">
 <!-- O iOS nao le o manifest para o icone da tela inicial: quer a tag propria. -->
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">

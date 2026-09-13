@@ -1,12 +1,20 @@
 # Publica o MISSAO TI no GitHub Pages a cada push na main.
 #
-# O estande de verdade NAO usa isto: no dia da feira roda o INICIAR-ESTANDE.bat,
-# em localhost, sem depender de internet. Isto aqui e para ver de qualquer lugar
-# e para deixar uma copia viva fora da maquina.
+# O ESTANDE NAO DEPENDE DISTO. No dia da feira roda o INICIAR-ESTANDE.bat, em
+# localhost, sem internet. Nada neste arquivo e lido pelo .bat. O Pages serve
+# so para ver de qualquer lugar e para ter uma copia viva fora da maquina.
 #
-# Funciona em subcaminho (usuario.github.io/repositorio/) porque o vite.config.ts
-# usa `base: './'`, entao todo caminho gerado e relativo. Testado servindo o
-# dist/ dentro de uma subpasta: html, css, js e as 16 fontes responderam 200.
+# Publica pelos DOIS caminhos que o GitHub oferece, de proposito:
+#
+#   1. Empurra o build para a branch gh-pages.
+#      Serve quando Settings > Pages > Source = "Deploy from a branch".
+#   2. Manda o build como artefato de Pages.
+#      Serve quando Settings > Pages > Source = "GitHub Actions".
+#
+# A razao de fazer os dois: com a chave na opcao errada o site sobe a RAIZ do
+# repositorio, e a raiz tem o index.html de desenvolvimento, que aponta para
+# /src/main.tsx. Esse arquivo so existe com o Vite rodando, entao da 404 e a
+# tela fica preta. Cobrindo as duas opcoes, nao existe escolha errada.
 name: Pages
 
 on:
@@ -15,9 +23,8 @@ on:
   # Permite disparar na mao pela aba Actions, sem precisar de commit.
   workflow_dispatch:
 
-# O token so precisa publicar. Nada alem disso.
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -34,8 +41,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          # A mesma versao da maquina onde o jogo foi feito. Os testes usam
-          # o modo de tipos nativo do Node, que so existe daqui para cima.
+          # A mesma versao da maquina onde o jogo foi feito. Os testes usam o
+          # modo de tipos nativo do Node, que so existe daqui para cima.
           node-version: '24'
           cache: npm
 
@@ -47,6 +54,24 @@ jobs:
 
       - run: npm run build
 
+      # ---------------------------------------------- caminho 1: branch
+      - name: Empurrar para a branch gh-pages
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # .nojekyll: sem ele o GitHub passa o site pelo Jekyll, que ignora
+          # arquivo e pasta comecando com underline. Barato como seguro.
+          touch dist/.nojekyll
+          cd dist
+          git init -q
+          git checkout -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions" \
+              -c user.email="github-actions@users.noreply.github.com" \
+              commit -q -m "build de ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
+
+      # ---------------------------------------------- caminho 2: artefato
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -60,3 +85,7 @@ jobs:
     steps:
       - id: deploy
         uses: actions/deploy-pages@v4
+        # Se a chave estiver em "Deploy from a branch", este passo falha por
+        # projeto, nao por erro nosso: o caminho 1 ja publicou. Tolerar aqui
+        # evita o fluxo aparecer vermelho com o site no ar.
+        continue-on-error: true

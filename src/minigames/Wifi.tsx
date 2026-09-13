@@ -14,12 +14,12 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Renderer, Camera, Transform, Box, Sphere, Program, Mesh, Raycast, Vec2 } from 'ogl'
+import { Renderer, Camera, Transform, Box, Sphere, Program, Mesh, Raycast, Vec2, Vec3 } from 'ogl'
 import { PALETA, PISO_VERT, PISO_FRAG } from '../visual/palette.glsl.ts'
 import { criarJuice } from '../visual/juice.ts'
 import { criarDestrocos } from '../visual/debris.ts'
 import { ambiente, sExplosao, sEstilhaco } from '@/game/sound.ts'
-import { RotateCw, Wifi as WifiIcon, Check, MessageSquareWarning } from 'lucide-react'
+import { RotateCw, Wifi as WifiIcon, Check, MessageSquareWarning, TriangleAlert } from 'lucide-react'
 import { HudLabel } from '@/components/hud'
 import { useStuck, StuckHint } from '@/components/StuckHint'
 import type { WifiCase, AccessPoint } from '@/game/content.ts'
@@ -122,7 +122,13 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
 }) {
   const fx = useFx()
   const hostRef = useRef<HTMLDivElement>(null)
-  const alvos = wifi.aps.filter(a => a.status === 'falha').length
+  /* Os nomes dos pontos, colados neles na planta. Sem nome, a unica pista
+     sobra para o tamanho da bolha, que e o que este desafio deixou de ser. */
+  const labelBox = useRef<HTMLDivElement>(null)
+  const labelRefs = useRef(new Map<number, HTMLElement>())
+  /** Por que o ponto tocado nao explica a reclamacao. */
+  const [erro, setErro] = useState<string | null>(null)
+  const alvos = wifi.aps.filter(a => a.culpado).length
 
   const [found, setFound] = useState<number[]>([])
   const [selected, setSelected] = useState<number | null>(null)
@@ -169,6 +175,7 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
     const rig = new Transform()
     rig.setParent(scene)
 
+    const rotulo = new Vec3()
     const juice = criarJuice()
     const destrocos = criarDestrocos(gl, rig, { chao: 0.06, tamanho: 0.30 })
     ambiente('fabrica')
@@ -354,6 +361,23 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
 
       juice.aplicar(camera)
       renderer.render({ scene, camera })
+
+      const rect = labelBox.current?.getBoundingClientRect()
+      if (rect) {
+        for (const a of apMeshes) {
+          const el = labelRefs.current.get(a.index)
+          if (!el) continue
+          rotulo.set(a.ap.x, 1.9, a.ap.z)
+          rotulo.applyMatrix4(rig.worldMatrix)
+          camera.project(rotulo)
+          if (rotulo.z > 1) { el.style.opacity = '0'; continue }
+          const sx = (rotulo.x * 0.5 + 0.5) * rect.width
+          const sy = (-rotulo.y * 0.5 + 0.5) * rect.height
+          el.style.transform = 'translate(-50%,-100%) translate('
+            + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px)'
+          el.style.opacity = '1'
+        }
+      }
     }
     raf = requestAnimationFrame(frame)
 
@@ -375,25 +399,83 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
     const ap = wifi.aps[index]
     setSelected(index)
 
-    if (ap.status === 'falha') {
+    if (ap.culpado) {
       const next = [...live.current.found, index]
       setFound(next)
+      setErro(null)
       golpe.current?.(index, true)
       fx.hit()
       if (next.length >= alvos) setTimeout(() => finish(1), 900)
-    } else {
-      golpe.current?.(index, false)
-      fx.miss()
-      onPenalty()
+      return
     }
+
+    golpe.current?.(index, false)
+    fx.miss()
+    onPenalty()
+    setErro(ap.porQueNao
+      ?? (ap.status === 'ok'
+        ? ap.name + ' está operando normalmente. Procure entre os que acusam problema.'
+        : ap.name + ' não cobre o lugar de onde veio a reclamação.'))
+    setTimeout(() => setErro(null), 3600)
   }
 
   const sel = selected != null ? wifi.aps[selected] : null
 
   return (
     <div className="desafio-2 grid h-full grid-cols-1 gap-4 px-4 pb-4 amplo:grid-cols-[1fr_320px] amplo:gap-8 amplo:px-10 amplo:pb-6">
-      <div className="sala-3d relative min-h-0">
+      <div ref={labelBox} className="sala-3d relative min-h-0">
         <div ref={hostRef} className="absolute inset-0" />
+
+        {/* O nome de cada ponto, colado nele. Tambem e botao: alvo maior
+            que a caixinha na planta, e o jeito natural de escolher lendo. */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {wifi.aps.map((a, i) => {
+            const feito = found.includes(i)
+            return (
+              <button
+                key={a.name + ':' + i}
+                type="button"
+                ref={el => { if (el) labelRefs.current.set(i, el); else labelRefs.current.delete(i) }}
+                onPointerDown={() => pick(i)}
+                className="pointer-events-auto absolute left-0 top-0 whitespace-nowrap px-2 py-1 text-left outline-none"
+                style={{
+                  willChange: 'transform',
+                  opacity: 0,
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 13,
+                  letterSpacing: '.04em',
+                  color: feito ? 'var(--color-signal-green)' : 'var(--color-label)',
+                  border: '1px solid ' + (feito ? 'var(--color-signal-green)' : 'rgba(33,200,246,.22)'),
+                  background: feito ? 'rgba(37,223,160,.16)' : 'rgba(8,11,30,.86)',
+                  transition: 'color .2s, border-color .2s, background .2s',
+                }}
+              >
+                {a.name}
+              </button>
+            )
+          })}
+        </div>
+
+        <AnimatePresence>
+          {erro && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="pointer-events-none absolute inset-x-0 top-2 flex justify-center px-2"
+            >
+              <div
+                className="flex max-w-xl items-start gap-2.5 px-5 py-2.5"
+                style={{
+                  border: '1px solid var(--color-signal-amber)',
+                  background: 'rgba(8,11,30,.94)',
+                  color: 'var(--color-signal-amber)', fontSize: 15, lineHeight: 1.4,
+                }}
+              >
+                <TriangleAlert size={17} className="mt-0.5 shrink-0" />
+                {erro}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-1 flex flex-col items-center gap-2">
           <div

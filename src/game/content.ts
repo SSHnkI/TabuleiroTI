@@ -586,6 +586,17 @@ export interface AccessPoint {
   /** Raio de cobertura. Cai junto com o estado. */
   range: number
   detail: string
+  /**
+   * Este ponto explica a reclamacao da pergunta?
+   *
+   * Antes a resposta era o buraco visivel no mapa: havia um ponto com
+   * problema e pronto. Agora ha varios, como num galpao de verdade, e quem
+   * decide e ONDE a pessoa reclamou. Continua sem exigir conhecimento de
+   * rede: o nome do ponto diz o setor.
+   */
+  culpado?: boolean
+  /** Por que este ponto NAO explica a reclamacao. Dito no erro. */
+  porQueNao?: string
 }
 
 export interface WifiWall { x: number; z: number; w: number; d: number }
@@ -613,12 +624,21 @@ export const WIFI_CASES: WifiCase[] = [
   {
     difficulty: 'facil',
     label: 'Wi-Fi do escritório',
-    question: 'Um ponto de acesso caiu. Ache o buraco de sinal.',
+    question: 'A sala de reunião perdeu a chamada de vídeo. Qual ponto de acesso explica isso?',
     walls: GALPAO,
     aps: [
       { name: 'AP-RECEPÇÃO', x: -4.2, z: 3.0, status: 'ok', range: 3.0, detail: 'Operando. 7 aparelhos conectados.' },
       { name: 'AP-COMERCIAL', x: -4.0, z: -2.8, status: 'ok', range: 3.2, detail: 'Operando. 14 aparelhos conectados.' },
-      { name: 'AP-REUNIÃO', x: -0.6, z: 0.4, status: 'falha', range: 0.6, detail: 'Sem energia. A sala de reunião ficou sem chamada de vídeo.' },
+      {
+        name: 'AP-REUNIÃO', x: -0.6, z: 0.4, status: 'falha', range: 0.6,
+        culpado: true,
+        detail: 'Sem energia. É o ponto que cobre a sala de reunião.',
+      },
+      {
+        name: 'AP-ESTACIONAMENTO', x: 4.8, z: -3.6, status: 'falha', range: 0.6,
+        porQueNao: 'Está fora mesmo, e quem fica no pátio perdeu sinal. Mas a sala de reunião é do outro lado do prédio.',
+        detail: 'Sem energia. O pátio ficou sem cobertura.',
+      },
       { name: 'AP-DIRETORIA', x: 2.6, z: -3.0, status: 'ok', range: 2.8, detail: 'Operando. 4 aparelhos conectados.' },
       { name: 'AP-REFEITÓRIO', x: 3.4, z: 3.2, status: 'ok', range: 2.8, detail: 'Operando. 11 aparelhos conectados.' },
     ],
@@ -627,33 +647,61 @@ export const WIFI_CASES: WifiCase[] = [
   {
     difficulty: 'medio',
     label: 'Wi-Fi do galpão',
-    question: 'Um ponto de acesso caiu. Ache o buraco de sinal.',
+    question: 'A expedição parou de bipar os volumes. Qual ponto de acesso explica isso?',
     walls: GALPAO,
     aps: [
       { name: 'AP-ESCRITÓRIO', x: -4.4, z: -3.0, status: 'ok', range: 3.2, detail: 'Operando. 18 aparelhos conectados.' },
       { name: 'AP-PRODUÇÃO', x: 1.0, z: -2.6, status: 'ok', range: 3.4, detail: 'Operando. 31 aparelhos conectados.' },
-      { name: 'AP-EXPEDIÇÃO', x: 4.6, z: 3.0, status: 'falha', range: 0.6, detail: 'Sem energia. A expedição inteira ficou sem coletor.' },
-      { name: 'AP-REFEITÓRIO', x: -4.2, z: 3.2, status: 'ok', range: 3.0, detail: 'Operando. 9 aparelhos conectados.' },
-      { name: 'AP-DOCA', x: 0.6, z: 4.0, status: 'ok', range: 2.8, detail: 'Operando. 6 aparelhos conectados.' },
+      {
+        name: 'AP-EXPEDIÇÃO', x: 4.6, z: 3.0, status: 'falha', range: 0.6,
+        culpado: true,
+        detail: 'Sem energia. É o ponto que cobre a doca e os coletores da expedição.',
+      },
+      {
+        name: 'AP-REFEITÓRIO', x: -4.2, z: 3.2, status: 'falha', range: 0.6,
+        porQueNao: 'Caiu mesmo, e ninguém pega sinal no almoço. Mas volume não é bipado no refeitório.',
+        detail: 'Fora do ar. O refeitório ficou sem sinal.',
+      },
+      { name: 'AP-DOCA', x: 0.6, z: 4.0, status: 'atencao', range: 2.2, detail: 'Aviso: sinal fraco por interferência. Ainda conecta.' },
       { name: 'AP-ALMOXARIFADO', x: -1.8, z: 0.2, status: 'ok', range: 2.8, detail: 'Operando. 4 aparelhos conectados.' },
       { name: 'AP-PORTARIA', x: 5.2, z: -3.2, status: 'ok', range: 2.4, detail: 'Operando. 3 aparelhos conectados.' },
     ],
-    queixas: [{ x: 4.4, z: 3.2, texto: 'Coletor não conecta' }],
+    queixas: [{ x: 4.4, z: 3.2, texto: 'Coletor da expedição não conecta' }],
   },
   {
     difficulty: 'dificil',
     label: 'Wi-Fi da fábrica',
-    question: 'Dois pontos falharam. Amarelo é sinal fraco, não queda.',
+    question: 'A linha 1 e a expedição pararam. Ache os dois pontos responsáveis. Amarelo é sinal fraco, não queda.',
     walls: GALPAO,
     aps: [
       { name: 'AP-ESCRITÓRIO', x: -4.6, z: -3.2, status: 'ok', range: 3.2, detail: 'Operando.' },
-      { name: 'AP-LINHA-1', x: 0.4, z: -3.4, status: 'falha', range: 0.6, detail: 'Fora do ar. O apontamento da linha 1 parou.' },
-      { name: 'AP-LINHA-2', x: 2.4, z: -0.4, status: 'atencao', range: 2.2, detail: 'Sinal fraco por interferência do motor. Ainda conecta.' },
-      { name: 'AP-EXPEDIÇÃO', x: 5.0, z: 3.2, status: 'falha', range: 0.6, detail: 'Cabo de rede rompido na canaleta.' },
-      { name: 'AP-REFEITÓRIO', x: -4.4, z: 3.4, status: 'ok', range: 2.8, detail: 'Operando.' },
+      {
+        name: 'AP-LINHA-1', x: 0.4, z: -3.4, status: 'falha', range: 0.6,
+        culpado: true,
+        detail: 'Fora do ar. É o ponto que cobre o apontamento da linha 1.',
+      },
+      {
+        name: 'AP-LINHA-2', x: 2.4, z: -0.4, status: 'atencao', range: 2.2,
+        porQueNao: 'Amarelo é sinal fraco, não queda. A linha 2 reclama, mas continua conectando.',
+        detail: 'Sinal fraco por interferência do motor. Ainda conecta.',
+      },
+      {
+        name: 'AP-EXPEDIÇÃO', x: 5.0, z: 3.2, status: 'falha', range: 0.6,
+        culpado: true,
+        detail: 'Cabo de rede rompido na canaleta. Cobre a doca e os coletores.',
+      },
+      {
+        name: 'AP-REFEITÓRIO', x: -4.4, z: 3.4, status: 'falha', range: 0.6,
+        porQueNao: 'Está fora, e o refeitório ficou sem sinal. Mas nenhuma das duas paradas acontece lá.',
+        detail: 'Fora do ar. O refeitório ficou sem sinal.',
+      },
       { name: 'AP-DOCA', x: 0.2, z: 4.0, status: 'ok', range: 2.6, detail: 'Operando.' },
       { name: 'AP-ALMOXARIFADO', x: -2.2, z: 0.6, status: 'ok', range: 2.6, detail: 'Operando.' },
-      { name: 'AP-PORTARIA', x: 5.4, z: -3.4, status: 'ok', range: 2.2, detail: 'Operando.' },
+      {
+        name: 'AP-PORTARIA', x: 5.4, z: -3.4, status: 'atencao', range: 2.0,
+        porQueNao: 'Amarelo é aviso. A portaria conecta devagar, mas conecta.',
+        detail: 'Aviso: sinal fraco perto do portão.',
+      },
       { name: 'AP-MANUTENÇÃO', x: -1.0, z: -1.4, status: 'ok', range: 2.4, detail: 'Operando.' },
     ],
     queixas: [

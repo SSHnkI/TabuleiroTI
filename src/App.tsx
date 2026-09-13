@@ -20,6 +20,7 @@ import { Briefing } from './screens/Briefing.tsx'
 import { saveDuel } from './game/storage.ts'
 import { loadMuted, setMuted, unlockAudio, sStart, sFinish } from './game/sound.ts'
 import { Play } from './screens/Play.tsx'
+import { Treino } from './screens/Treino.tsx'
 import { FxProvider } from './visual/Fx.tsx'
 
 /** Segundos parado antes de a tela voltar sozinha para o modo atracao.
@@ -69,6 +70,9 @@ export default function App() {
   // resultado gravaria a mesma pontuacao de novo e sujaria o ranking.
   useEffect(() => {
     if (state.screen !== 'result' || state.mode === 'duelo') return
+    // Treino livre nao existe para o placar: nao grava, nao conta jogador,
+    // nao vai para o CSV. Senao uma manha de ensaio mentiria no numero do dia.
+    if (state.treinoLivre) { savedFor.current = state.startedAt; sFinish(); return }
     if (savedFor.current === state.startedAt) return
     savedFor.current = state.startedAt
     sFinish()
@@ -98,7 +102,7 @@ export default function App() {
     for (const ev of ['pointerdown', 'keydown']) window.addEventListener(ev, touch)
     const id = setInterval(() => {
       const idle = (Date.now() - idleRef.current) / 1000
-      if (idle > IDLE_SECONDS && state.screen !== 'attract' && state.screen !== 'playing') {
+      if (idle > IDLE_SECONDS && state.screen !== 'attract' && state.screen !== 'playing' && state.screen !== 'treino') {
         dispatch({ type: 'abort' })
       }
     }, 1000)
@@ -166,7 +170,7 @@ export default function App() {
 
         <div className="relative h-full w-full" style={{ zIndex: 30 }}>
         {state.screen === 'attract' && (
-          <Attract runs={runs} onStart={() => dispatch({ type: 'goto', screen: 'mode' })} />
+          <Attract runs={runs} onRuns={setRuns} onStart={() => dispatch({ type: 'goto', screen: 'mode' })} />
         )}
         {state.screen === 'mode' && (
           <ModeSelect
@@ -252,6 +256,14 @@ export default function App() {
             onMute={v => { setMuted(v); setMutedState(v) }}
             onRuns={setRuns}
             onClose={() => dispatch({ type: 'abort' })}
+            onTreino={() => dispatch({ type: 'goto', screen: 'treino' })}
+          />
+        )}
+
+        {state.screen === 'treino' && (
+          <Treino
+            onEscolher={id => dispatch({ type: 'treinar', id })}
+            onVoltar={() => dispatch({ type: 'goto', screen: 'admin' })}
           />
         )}
 

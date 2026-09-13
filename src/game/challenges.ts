@@ -116,10 +116,7 @@ export function drawRound(rand: () => number = Math.random): ChallengeSpec[] {
     : null
 
   if (forcar) {
-    const so: ChallengeSpec[] = []
-    for (const d of ['facil', 'medio', 'dificil', 'critico'] as Difficulty[]) {
-      for (const c of poolFor(d, rand)) if (c.id === forcar) so.push(c)
-    }
+    const so = rodadaDeUmTipo(forcar as MinigameId, rand)
     if (so.length) return so
   }
 
@@ -135,4 +132,20 @@ export function drawRound(rand: () => number = Math.random): ChallengeSpec[] {
     round.push(escolha)
   }
   return round
+}
+
+/**
+ * Uma rodada feita SO de um tipo de desafio, em todas as criticidades em que
+ * ele existe, da mais leve para a mais pesada.
+ *
+ * Serve a dois donos: o atalho ?desafio= do operador e a tela de treino. Os
+ * dois querem a mesma coisa, conferir um desafio sem jogar a rodada inteira
+ * ate ele cair, o que para um desafio critico levaria dois minutos.
+ */
+export function rodadaDeUmTipo(id: MinigameId, rand: () => number = Math.random): ChallengeSpec[] {
+  const so: ChallengeSpec[] = []
+  for (const d of ['facil', 'medio', 'dificil', 'critico'] as Difficulty[]) {
+    for (const c of poolFor(d, rand)) if (c.id === id) so.push(c)
+  }
+  return so
 }

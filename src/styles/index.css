@@ -1,6 +1,15 @@
 @import "./fonts.css";
 @import "tailwindcss";
 
+/* "amplo" = ha largura para duas colunas.
+   Vale no monitor do estande E no celular deitado. Usar lg: sozinho era erro:
+   um celular de 812x375 nao e lg, mas e largo, e empilhar ali desperdica a
+   tela inteira e ainda obriga a rolar para alcancar o proprio desafio. */
+@custom-variant amplo {
+  @media (min-width: 1024px) { @slot }
+  @media (min-width: 600px) and (orientation: landscape) { @slot }
+}
+
 /* ==========================================================================
    MISSAO TI :: tokens
    Paleta ancorada na marca Plastireal, lida das variaveis CSS do site:
@@ -268,17 +277,48 @@
 }
 
 /* ==================================================================== CELULAR
-   O estande e um monitor de 24 polegadas deitado, 1920x1080. Celular em pe e
-   outra coisa: 390 de largura, 844 de altura.
+   O estande e um monitor de 24 polegadas deitado, 1920x1080. Celular e outra
+   coisa, e sao DUAS coisas diferentes:
 
-   Nada aqui vale acima de 1024px, entao o estande continua exatamente igual.
-   Abaixo disso: as colunas empilham (os grid-cols-1 nos desafios) e a pagina
-   volta a rolar, porque conteudo empilhado nao cabe numa tela de celular.
+   EM PE (375x812): falta largura. As colunas empilham e a pagina volta a
+   rolar, porque conteudo empilhado nao cabe em 812 de altura.
 
-   A rolagem e o unico ponto em que o modo quiosque cede. Continua sem
-   pull-to-refresh e sem zoom por duplo toque: o que muda e so poder alcancar
-   o que ficou embaixo. */
+   DEITADO (812x375): sobra largura e falta altura. Aqui empilhar seria o
+   erro: as duas colunas continuam lado a lado (e o que a variante "amplo"
+   resolve) e o quiosque segue sem rolagem, so com respiro menor.
+
+   Nada disto vale acima de 1024px: o estande continua identico. */
+
+/* ---------------------------------------------------- os dois, em comum */
 @media (max-width: 1023px) {
+  /* Filho de grid e de flex nasce com min-width:auto, entao UM botao largo
+     empurra a tela inteira para fora. Aqui todo mundo pode encolher. */
+  #root main,
+  #root main * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Moldura de cantos e pulso de dados sao decoracao de tela grande. Num
+     celular eles brigam com a barra do sistema. */
+  .ctos-frame,
+  .ctos-uplink {
+    display: none;
+  }
+
+  /* Alvo de toque continua grande, mas 72px em tela de celular empilha
+     rapido demais. 60 ainda e folgado para dedo (16mm). */
+  [data-touch-target] {
+    min-height: 60px;
+  }
+}
+
+/* ------------------------------------------------------------- EM PE
+   A rolagem e o unico ponto em que o modo quiosque cede. Continua sem
+   pull-to-refresh e sem zoom por duplo toque: o que muda e so poder
+   alcancar o que ficou embaixo. */
+@media (max-width: 1023px) and (orientation: portrait),
+       (max-width: 599px) {
   html, body {
     overflow: auto;
     height: auto;
@@ -291,46 +331,27 @@
   }
 
   /* Os containers de tela usam h-full, que dentro de um pai de altura
-     automatica vira zero. Aqui eles passam a ter altura minima de tela e
-     crescem com o conteudo. */
+     automatica vira zero. Aqui ganham altura minima de tela e crescem
+     com o conteudo. */
   #root main,
   #root main > div {
     height: auto !important;
     min-height: 100dvh;
     overflow: visible !important;
   }
-
-  /* A moldura de cantos e o pulso de dados sao decoracao de tela grande.
-     Num celular eles brigam com a barra do sistema. */
-  .ctos-frame,
-  .ctos-uplink {
-    display: none;
-  }
-
-  /* Alvo de toque continua grande, mas 72px de altura em tela de 844
-     empilha rapido demais. 60 ainda e folgado para dedo (16mm). */
-  [data-touch-target] {
-    min-height: 60px;
-  }
 }
 
-/* Celular DEITADO: pouca altura, muita largura. Aqui o problema e o oposto,
-   sobra largura e falta altura, entao o 3D encolhe em vez de empurrar tudo
-   para fora da tela. */
-@media (max-width: 1023px) and (orientation: landscape) {
-  #root main,
-  #root main > div {
-    min-height: 100dvh;
+/* ---------------------------------------------------------- DEITADO
+   Continua quiosque: tela cheia, sem rolagem. O 3D encolhe junto em vez de
+   empurrar o resto para fora, e o dvh entra no lugar do vh porque a barra
+   do navegador do celular come altura de verdade. */
+@media (max-width: 1023px) and (orientation: landscape) and (min-width: 600px) {
+  html, body, #root {
+    height: 100dvh;
+    overflow: hidden;
   }
-}
 
-/* Filho de grid e de flex nasce com min-width:auto, entao UM botao largo
-   empurra a tela inteira para fora em celular. Aqui todo mundo pode encolher.
-   Vale so abaixo de 1024px: no estande as larguras sao intencionais. */
-@media (max-width: 1023px) {
-  #root main,
-  #root main * {
-    min-width: 0;
-    max-width: 100%;
+  #root main {
+    height: 100dvh;
   }
 }

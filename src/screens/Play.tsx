@@ -139,7 +139,7 @@ export function Play({ state, onDone, onPenalty, onPause }: {
             transition={{ duration: 0.22 }}
           >
             <motion.div
-              className="w-full px-4 lg:px-16 text-center"
+              className="w-full px-4 amplo:px-16 text-center"
               initial={{ scale: 0.85, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               transition={{ type: 'spring', stiffness: 260, damping: 22 }}

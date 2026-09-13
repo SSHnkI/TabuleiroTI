@@ -5,19 +5,27 @@
  * atravessa o corredor para jogar. Como ninguem esta lendo nem tocando,
  * aqui a intensidade visual pode ser maxima, sem prejudicar a latencia.
  */
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { EncryptedText } from '@/components/ui/encrypted-text'
 import { NumberTicker } from '@/components/motion/number-ticker'
 import { Panel, HudLabel, Dot, Rule } from '@/components/hud'
 import { HoldToStart } from '@/components/HoldToStart'
+import { BigButton } from '@/components/BigButton'
 import { rankRuns, stats, type Run } from '@/game/scoring.ts'
+import { clearAll } from '@/game/storage.ts'
 import { EASE_OUT } from '@/lib/ease'
 
 const ROTATE_MS = 7000
 
-export function Attract({ runs, onStart }: { runs: Run[]; onStart: () => void }) {
+export function Attract({ runs, onStart, onRuns }: {
+  runs: Run[]
+  onStart: () => void
+  /** Chamado quando o placar e apagado pelo atalho escondido. */
+  onRuns: (runs: Run[]) => void
+}) {
   const [slide, setSlide] = useState(0)
+  const [pedindoApagar, setPedindoApagar] = useState(false)
 
   const individual = rankRuns(runs, ['solo', 'duelo']).slice(0, 5)
   const teams = rankRuns(runs, ['revezamento', 'equipe']).slice(0, 5)
@@ -40,20 +48,28 @@ export function Attract({ runs, onStart }: { runs: Run[]; onStart: () => void })
   }, [slides.length])
 
   return (
-    <div className="relative grid h-full w-full grid-rows-[auto_1fr_auto] px-4 py-4 lg:px-10 lg:py-7">
+    <div className="relative grid h-full w-full grid-rows-[auto_1fr_auto] px-4 py-4 amplo:px-10 amplo:py-7">
       {/* ---------------------------------------------------- faixa superior */}
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Dot /><Dot delay={0.3} /><Dot delay={0.6} />
           <HudLabel>Tecnologia · Sistema de chamados</HudLabel>
         </div>
-        <HudLabel>Estande TI · Expoplasti</HudLabel>
+        {/* O "o" de Expoplasti e um botao. Segure um segundo e meio para
+            pedir o apagamento do placar.
+            Por que escondido assim: o operador precisa zerar o dia sem
+            atravessar o painel inteiro na frente da fila, e ao mesmo tempo
+            um visitante curioso nao pode apagar o ranking por acidente.
+            Segurar, e nao tocar, e o que garante as duas coisas. */}
+        <HudLabel>
+          Estande TI · Exp<SegredoO onSegurar={() => setPedindoApagar(true)} />plasti
+        </HudLabel>
       </header>
 
       {/* ------------------------------------------------------------ centro */}
       {/* min-w-0: sem isto o titulo gigante recusa encolher e empurra a coluna
           do ranking para fora da tela. Filho de grid tem min-width:auto por padrao. */}
-      <section className="grid min-h-0 grid-cols-1 items-center gap-6 lg:grid-cols-[1.15fr_.85fr] lg:gap-14">
+      <section className="grid min-h-0 grid-cols-1 items-center gap-6 amplo:grid-cols-[1.15fr_.85fr] amplo:gap-14">
         <div className="min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -151,6 +167,14 @@ export function Attract({ runs, onStart }: { runs: Run[]; onStart: () => void })
         </Panel>
       </section>
 
+      {pedindoApagar && (
+        <ConfirmarApagar
+          total={runs.length}
+          onCancelar={() => setPedindoApagar(false)}
+          onApagar={() => { onRuns(clearAll()); setPedindoApagar(false) }}
+        />
+      )}
+
       {/* ---------------------------------------------------- faixa inferior */}
       <footer className="flex items-end justify-between">
         <div className="flex gap-12">
@@ -172,6 +196,91 @@ function Stat({ label, value, tone = '#EAFBFF' }: { label: string; value: number
         {/* startOnView={false}: sem isto o contador anima uma vez e congela,
             porque o componente espera entrar em viewport e aqui ele ja nasce visivel. */}
         <NumberTicker value={value} startOnView={false} />
+      </div>
+    </div>
+  )
+}
+
+/**
+ * O "o" escondido.
+ *
+ * Nao muda de aparencia: precisa parecer letra, senao deixa de ser atalho e
+ * vira botao. O unico sinal e o proprio tempo de espera.
+ */
+function SegredoO({ onSegurar }: { onSegurar: () => void }) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const parar = () => {
+    if (timer.current) clearTimeout(timer.current)
+    timer.current = null
+  }
+
+  useEffect(() => parar, [])
+
+  return (
+    <span
+      role="presentation"
+      style={{ cursor: 'inherit', touchAction: 'none' }}
+      onPointerDown={e => {
+        e.stopPropagation()
+        parar()
+        timer.current = setTimeout(onSegurar, 1500)
+      }}
+      onPointerUp={parar}
+      onPointerLeave={parar}
+      onPointerCancel={parar}
+    >
+      o
+    </span>
+  )
+}
+
+/** Confirmacao de apagar. Duas perguntas seria teatro; uma, com o numero de
+ *  partidas que somem escrito na tela, e informacao. */
+function ConfirmarApagar({ total, onApagar, onCancelar }: {
+  total: number
+  onApagar: () => void
+  onCancelar: () => void
+}) {
+  return (
+    <div
+      className="fixed inset-0 grid place-items-center px-6"
+      style={{ zIndex: 60, background: 'rgba(4,5,15,.88)' }}
+    >
+      <div
+        className="w-full max-w-lg p-8"
+        style={{
+          clipPath: 'var(--notch)',
+          background: 'var(--color-ink-800)',
+          border: '1px solid var(--color-signal-red)',
+          boxShadow: 'var(--glow-red)',
+        }}
+      >
+        <HudLabel>Atalho do operador</HudLabel>
+        <h2
+          className="mt-3 uppercase"
+          style={{
+            fontFamily: 'var(--font-display)', fontWeight: 700,
+            fontSize: 'clamp(22px, 5.6vw, 34px)', color: 'var(--color-signal-red)',
+          }}
+        >
+          Apagar o placar do dia?
+        </h2>
+        <p className="mt-3" style={{ color: 'var(--color-label)' }}>
+          {total === 0
+            ? 'Não há nenhuma partida gravada. Não vai sumir nada.'
+            : total + (total === 1 ? ' partida gravada some' : ' partidas gravadas somem')
+              + '. Isto não tem volta: exporte o CSV antes se ainda precisar dos números.'}
+        </p>
+
+        <div className="mt-7 flex flex-col gap-3 amplo:flex-row">
+          <BigButton tone="ghost" className="flex-1" onTap={onCancelar}>
+            Cancelar
+          </BigButton>
+          <BigButton tone="danger" className="flex-1" onTap={onApagar}>
+            Apagar tudo
+          </BigButton>
+        </div>
       </div>
     </div>
   )

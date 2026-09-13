@@ -9,9 +9,7 @@
  * brincadeira de visitante em dois minutos de feira.
  */
 import { useEffect, useRef, useState } from 'react'
-import {
-  Download, Undo2, Trash2, Volume2, VolumeX, Hand, X, Gauge, ShieldCheck, AlertTriangle,
-} from 'lucide-react'
+import { AlertTriangle, Download, Dumbbell, Gauge, Hand, ShieldCheck, Trash2, Undo2, Volume2, VolumeX, X } from 'lucide-react'
 import { HudLabel, Panel, Rule } from '@/components/hud'
 import { BigButton } from '@/components/BigButton'
 import { HoldToConfirmButton } from '@/components/spectrumui/hold-to-confirm'
@@ -19,20 +17,22 @@ import { downloadCSV, undoLast, clearAll, storageHealth } from '@/game/storage.t
 import { stats, type Run } from '@/game/scoring.ts'
 import { forceTier, type PerfTier, type PerfState } from '@/visual/perf.ts'
 
-export function Admin({ runs, perf, muted, onMute, onRuns, onClose }: {
+export function Admin({ runs, perf, muted, onMute, onRuns, onClose, onTreino }: {
   runs: Run[]
   perf: PerfState
   muted: boolean
   onMute: (v: boolean) => void
   onRuns: (r: Run[]) => void
   onClose: () => void
+  /** Abre a escolha de desafio para treinar sem sujar o placar. */
+  onTreino: () => void
 }) {
   const s = stats(runs)
   const [touchTest, setTouchTest] = useState(false)
   const health = storageHealth()
 
   return (
-    <div className="h-full overflow-y-auto px-4 py-4 lg:px-10 lg:py-7">
+    <div className="h-full overflow-y-auto px-4 py-4 amplo:px-10 amplo:py-7">
       <header className="mb-6 flex items-start justify-between">
         <div>
           <HudLabel className="mb-1">Uso interno</HudLabel>
@@ -83,6 +83,12 @@ export function Admin({ runs, perf, muted, onMute, onRuns, onClose }: {
           <HudLabel className="mb-4">Durante a feira</HudLabel>
 
           <div className="space-y-3">
+            <Action
+              icon={<Dumbbell size={20} />}
+              title="Modo treino"
+              hint="Escolhe um desafio e joga só ele. Não entra no placar."
+              onTap={onTreino}
+            />
             <Action
               icon={<Download size={20} />}
               title="Exportar CSV agora"

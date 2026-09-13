@@ -8,10 +8,12 @@ import {
   DIFFICULTY_SECONDS, ERROR_TIME_PENALTY, totalScore,
   type GameMode, type MinigameResult,
 } from './scoring.ts'
-import { drawRound, type ChallengeSpec } from './challenges.ts'
+import { drawRound, rodadaDeUmTipo, type ChallengeSpec } from './challenges.ts'
+import type { MinigameId } from './scoring.ts'
 
 export type Screen =
   | 'attract' | 'mode' | 'name' | 'briefing' | 'playing' | 'result' | 'ranking' | 'admin'
+  | 'treino'
 
 /** Cores de jogador. Proposital: nenhuma delas e verde nem vermelha, que
  *  neste jogo significam "confirmado" e "errou" e nao podem virar identidade. */
@@ -35,6 +37,9 @@ export interface GameState {
   combo: number
   /** Partida repetida: pontua e comemora, mas nao entra no ranking. */
   training: boolean
+  /** Treino livre: escolheu o desafio na mao. Nem sequer e gravado, entao
+   *  nao entra no ranking, nao conta como jogador do dia e nao vai no CSV. */
+  treinoLivre: boolean
   score: number
   startedAt: number
   paused: boolean
@@ -51,6 +56,7 @@ export const initialState: GameState = {
   secondsLeft: 0,
   combo: 0,
   training: false,
+  treinoLivre: false,
   score: 0,
   startedAt: 0,
   paused: false,
@@ -66,6 +72,7 @@ export type Action =
   | { type: 'penalty'; seconds?: number }
   | { type: 'finishMinigame'; ratio: number }
   | { type: 'pause'; on: boolean }
+  | { type: 'treinar'; id: MinigameId }
   | { type: 'abort' }
   | { type: 'reset' }
 
@@ -100,6 +107,22 @@ export function reducer(s: GameState, a: Action): GameState {
         secondsLeft: round.length ? DIFFICULTY_SECONDS[round[0].difficulty] : 0,
         startedAt: Date.now(),
         paused: false,
+      }
+    }
+
+    case 'treinar': {
+      const round = rodadaDeUmTipo(a.id)
+      if (!round.length) return s
+      return {
+        ...initialState,
+        screen: 'playing',
+        mode: 'solo',
+        players: [{ name: 'TREINO', color: PLAYER_COLORS[0] }],
+        training: true,
+        treinoLivre: true,
+        round,
+        secondsLeft: DIFFICULTY_SECONDS[round[0].difficulty],
+        startedAt: Date.now(),
       }
     }
 

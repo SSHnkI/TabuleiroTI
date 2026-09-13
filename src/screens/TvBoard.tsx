@@ -46,7 +46,7 @@ export function TvBoard() {
   const duelKing = duelBoard(duels)[0]
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto] px-4 lg:px-14 py-10">
+    <div className="grid h-full grid-rows-[auto_1fr_auto] px-4 amplo:px-14 py-10">
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Radio size={30} style={{ color: 'var(--color-signal-red)' }} className="animate-pulse" />

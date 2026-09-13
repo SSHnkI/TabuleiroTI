@@ -391,8 +391,8 @@ export function Wifi({ wifi, secondsLeft, onDone, onPenalty }: {
   const sel = selected != null ? wifi.aps[selected] : null
 
   return (
-    <div className="grid h-full grid-cols-1 gap-4 px-4 pb-4 lg:grid-cols-[1fr_320px] lg:gap-8 lg:px-10 lg:pb-6">
-      <div className="sala-3d relative min-h-[46vh] lg:min-h-0">
+    <div className="grid h-full grid-cols-1 gap-4 px-4 pb-4 amplo:grid-cols-[1fr_320px] amplo:gap-8 amplo:px-10 amplo:pb-6">
+      <div className="sala-3d relative min-h-[46vh] amplo:min-h-0">
         <div ref={hostRef} className="absolute inset-0" />
 
         <div className="pointer-events-none absolute inset-x-0 bottom-1 flex flex-col items-center gap-2">

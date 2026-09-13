@@ -69,8 +69,8 @@ export function Result({ score, results, teamName, position, total, training, on
   const show = (n: number) => (stage >= n ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 })
 
   return (
-    <div className="relative grid h-full grid-rows-[1fr_auto] px-4 py-4 lg:px-12 lg:py-8">
-      <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[1.05fr_.95fr] lg:gap-14">
+    <div className="relative grid h-full grid-rows-[1fr_auto] px-4 py-4 amplo:px-12 amplo:py-8">
+      <div className="grid grid-cols-1 items-center gap-6 amplo:grid-cols-[1.05fr_.95fr] amplo:gap-14">
         {/* ------------------------------------------------- numero principal */}
         <div className="text-center">
           <motion.div animate={show(1)} transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}>

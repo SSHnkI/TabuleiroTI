@@ -57,10 +57,10 @@ export function GameHud({
   const tone = TONE[spec.difficulty]
 
   return (
-    <header className="relative px-4 pt-4 lg:px-9 lg:pt-6" style={{ zIndex: 35 }}>
-      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3 lg:flex-nowrap lg:gap-8">
+    <header className="relative px-4 pt-4 amplo:px-9 amplo:pt-6" style={{ zIndex: 35 }}>
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3 amplo:flex-nowrap amplo:gap-8">
         {/* ------------------------------------------------ etapa e progresso */}
-        <div className="order-last w-full min-w-0 lg:order-none lg:w-auto lg:flex-1">
+        <div className="order-last w-full min-w-0 amplo:order-none amplo:w-auto amplo:flex-1">
           <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
             <HudLabel>Etapa {index + 1} de {round.length}</HudLabel>
 
@@ -112,7 +112,7 @@ export function GameHud({
         </div>
 
         {/* ---------------------------------------------------------- relogio */}
-        <div className="flex flex-1 items-center gap-3 lg:block lg:flex-none lg:text-center">
+        <div className="flex flex-1 items-center gap-3 amplo:block amplo:flex-none amplo:text-center">
           <HudLabel className="mb-1">Tempo</HudLabel>
           <div
             className="tnum leading-none"
@@ -126,7 +126,7 @@ export function GameHud({
           >
             {String(secondsLeft).padStart(2, '0')}
           </div>
-          <div className="relative mt-2 hidden h-1 w-40 overflow-hidden lg:block" style={{ background: 'rgba(21,199,255,.12)' }}>
+          <div className="relative mt-2 hidden h-1 w-40 overflow-hidden amplo:block" style={{ background: 'rgba(21,199,255,.12)' }}>
             <div
               className="absolute inset-y-0 left-0"
               style={{
@@ -139,7 +139,7 @@ export function GameHud({
         </div>
 
         {/* --------------------------------------------- jogador da vez e nota */}
-        <div className="text-right lg:min-w-[230px]">
+        <div className="text-right amplo:min-w-[230px]">
           {/* Bloco inteiro na cor do jogador, nao so um ponto colorido: num
               grupo de quatro, saber de quem e a vez precisa ser legivel de
               relance, por quem esta em pe atras da pessoa que joga. */}

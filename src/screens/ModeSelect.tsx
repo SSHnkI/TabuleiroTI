@@ -43,7 +43,7 @@ export function ModeSelect({ onPick, onBack }: {
   }
 
   return (
-    <div className="grid h-full place-items-center px-4 lg:px-10">
+    <div className="grid h-full place-items-center px-4 amplo:px-10">
       <div className="w-full max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}

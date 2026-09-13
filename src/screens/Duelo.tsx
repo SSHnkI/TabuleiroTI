@@ -79,7 +79,7 @@ export function Duelo({ players, onFinish, onAbort }: {
   return (
     <div className="relative grid h-full grid-rows-[auto_1fr]">
       {/* --------------------------------------------------------- placar */}
-      <header className="flex items-center justify-between px-4 lg:px-10 pt-5">
+      <header className="flex items-center justify-between px-4 amplo:px-10 pt-5">
         <SideScore player={players[0]} score={blocked[0]} align="left" />
         <div className="text-center">
           <div className="mb-1 flex items-center justify-center gap-2">

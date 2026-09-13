@@ -71,7 +71,7 @@ export function HoldToStart({ onConfirm, label = 'SEGURE PARA INICIAR' }: {
       type="button"
       data-touch-target
       onPointerDown={begin}
-      className="relative flex w-full min-w-0 max-w-lg items-center gap-3 overflow-hidden px-4 py-5 uppercase outline-none lg:gap-5 lg:px-8 lg:py-6"
+      className="relative flex w-full min-w-0 max-w-lg items-center gap-3 overflow-hidden px-4 py-5 uppercase outline-none amplo:gap-5 amplo:px-8 amplo:py-6"
       style={{
         touchAction: 'none',
         border: '1px solid var(--color-cyan-core)',

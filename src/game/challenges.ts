@@ -104,22 +104,16 @@ function poolFor(d: Difficulty, rand: () => number): ChallengeSpec[] {
  * um tipo do que devolver uma rodada mais curta e quebrar o maximo de 100.
  */
 export function drawRound(rand: () => number = Math.random): ChallengeSpec[] {
-  // Atalho de conferencia: ?desafio=rack monta a rodada SO com aquele tipo,
-  // em todas as criticidades em que ele existe, ja na primeira etapa. Serve
-  // para conferir um desafio no monitor do estande sem jogar a rodada
-  // inteira ate ele cair, o que para um desafio critico levaria dois minutos.
+  // Aqui existia um atalho ?desafio=rack que montava a rodada so com aquele
+  // tipo. Foi REMOVIDO, e o motivo vale registro:
   //
-  // A rodada fica mais curta e a pontuacao sai menor: e ferramenta de
-  // conferencia, nao partida valendo.
-  const forcar = typeof location !== 'undefined'
-    ? new URLSearchParams(location.search).get('desafio')
-    : null
-
-  if (forcar) {
-    const so = rodadaDeUmTipo(forcar as MinigameId, rand)
-    if (so.length) return so
-  }
-
+  // O atalho ficava grudado na URL. Quem abrisse o jogo uma vez com ele
+  // jogava partida apos partida com o mesmo desafio, sem nenhum aviso na
+  // tela, e concluia que o sorteio estava quebrado. Num estande isso seria
+  // pior: o primeiro visitante do dia define o desafio de todos os outros.
+  //
+  // O Modo Treino faz a mesma coisa melhor: escolha explicita, visivel,
+  // que vale para UMA partida e nao contamina a proxima.
   const usados = new Set<MinigameId>()
   const round: ChallengeSpec[] = []
 

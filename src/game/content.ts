@@ -143,6 +143,7 @@ export const FIREWALL_LIVES = 3
 
 /** Quanto mais critico, mais senhas e mais rapido. */
 export const FIREWALL_TUNING: Partial<Record<Difficulty, { drops: number; speed: number }>> = {
+  facil: { drops: 10, speed: 0.85 },
   medio: { drops: 16, speed: 1 },
   dificil: { drops: 22, speed: 1.2 },
   critico: { drops: 28, speed: 1.45 },
@@ -406,7 +407,7 @@ export const RESTORE_STEPS: RestoreStep[] = [
 
 /** Quanto mais critico, mais longa a sequencia a memorizar. */
 export const BACKUP_TUNING: Partial<Record<Difficulty, number>> = {
-  medio: 4, dificil: 5, critico: 6,
+  facil: 3, medio: 4, dificil: 5, critico: 6,
 }
 
 /* ============================================================== DIAGNOSTICO */
@@ -541,6 +542,20 @@ const GALPAO: WifiWall[] = [
 ]
 
 export const WIFI_CASES: WifiCase[] = [
+  {
+    difficulty: 'facil',
+    label: 'Wi-Fi do escritório',
+    question: 'Um ponto de acesso caiu. Ache o buraco de sinal.',
+    walls: GALPAO,
+    aps: [
+      { name: 'AP-RECEPÇÃO', x: -4.2, z: 3.0, status: 'ok', range: 3.0, detail: 'Operando. 7 aparelhos conectados.' },
+      { name: 'AP-COMERCIAL', x: -4.0, z: -2.8, status: 'ok', range: 3.2, detail: 'Operando. 14 aparelhos conectados.' },
+      { name: 'AP-REUNIÃO', x: -0.6, z: 0.4, status: 'falha', range: 0.6, detail: 'Sem energia. A sala de reunião ficou sem chamada de vídeo.' },
+      { name: 'AP-DIRETORIA', x: 2.6, z: -3.0, status: 'ok', range: 2.8, detail: 'Operando. 4 aparelhos conectados.' },
+      { name: 'AP-REFEITÓRIO', x: 3.4, z: 3.2, status: 'ok', range: 2.8, detail: 'Operando. 11 aparelhos conectados.' },
+    ],
+    queixas: [{ x: -0.4, z: 0.8, texto: 'Reunião caindo toda hora' }],
+  },
   {
     difficulty: 'medio',
     label: 'Wi-Fi do galpão',

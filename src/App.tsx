@@ -31,6 +31,11 @@ const IDLE_SECONDS = 20
  *  dois papeis: se a TV nao aparecer no dia, nada muda. */
 const IS_TV = new URLSearchParams(location.search).has('tv')
 
+/** ?treino=1 abre direto a escolha de desafio. Ao contrario do antigo
+ *  ?desafio=, nao forca rodada nenhuma: e so um atalho para uma TELA, e a
+ *  partida seguinte volta a ser sorteada normalmente. */
+const ABRIR_TREINO = new URLSearchParams(location.search).has('treino')
+
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState)
   const [runs, setRuns] = useState<Run[]>(() => loadRuns())
@@ -45,6 +50,10 @@ export default function App() {
   const idleRef = useRef(Date.now())
 
   useEffect(() => startPerfMonitor(), [])
+
+  useEffect(() => {
+    if (ABRIR_TREINO) dispatch({ type: 'goto', screen: 'treino' })
+  }, [])
 
   // O navegador so libera audio apos um gesto. Destravar no primeiro toque
   // da sessao evita o primeiro efeito sonoro sair mudo. Tecla tambem conta:
@@ -263,7 +272,7 @@ export default function App() {
         {state.screen === 'treino' && (
           <Treino
             onEscolher={id => dispatch({ type: 'treinar', id })}
-            onVoltar={() => dispatch({ type: 'goto', screen: 'admin' })}
+            onVoltar={() => dispatch({ type: 'goto', screen: ABRIR_TREINO ? 'attract' : 'admin' })}
           />
         )}
 

@@ -26,7 +26,7 @@ import { PALETA, PISO_VERT, PISO_FRAG } from '../visual/palette.glsl.ts'
 import { criarJuice } from '../visual/juice.ts'
 import { criarDestrocos } from '../visual/debris.ts'
 import { ambiente, sExplosao, sEstilhaco } from '@/game/sound.ts'
-import { RotateCw, Server, Check } from 'lucide-react'
+import { RotateCw, Server, Check, TriangleAlert } from 'lucide-react'
 import { HudLabel } from '@/components/hud'
 import { useStuck, StuckHint } from '@/components/StuckHint'
 import type { RackCase, RackUnit } from '@/game/content.ts'
@@ -185,11 +185,20 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
 }) {
   const fx = useFx()
   const hostRef = useRef<HTMLDivElement>(null)
-  const alvos = rack.units.filter(u => u.status === 'falha').length
+  /* Os nomes das pecas, ancorados em cada unidade.
+     Sem eles o rack e uma pilha de caixas iguais e a unica pista sobra para
+     a cor, que e justamente o que este desafio deixou de ser. Com o nome a
+     vista, quem le o chamado sabe onde tocar antes de tocar. */
+  const labelBox = useRef<HTMLDivElement>(null)
+  const labelRefs = useRef(new Map<number, HTMLElement>())
+  const alvos = rack.units.filter(u => u.culpado).length
 
   const [found, setFound] = useState<number[]>([])
   const [selected, setSelected] = useState<number | null>(null)
   const [behind, setBehind] = useState(false)
+  /** Por que a peca tocada nao explica o chamado. Sem isto, varias luzes
+   *  vermelhas viram tentativa e erro em vez de leitura. */
+  const [erro, setErro] = useState<string | null>(null)
   const finished = useRef(false)
   const travado = useStuck(found.length, 12000)
 
@@ -470,6 +479,8 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
 
     /* ------------------------------------------------------------- render */
     let raf = 0
+    const rotulo = new Vec3()
+
     /** Quanto cada unidade ja saiu do rack. Consertada, desliza para fora. */
     const saida = new Float32Array(units.length)
 
@@ -509,6 +520,27 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
 
       juice.aplicar(camera)
       renderer.render({ scene, camera })
+
+      // Rotulos escritos direto no style, sem passar por estado do React:
+      // sao dezenas de atualizacoes por segundo.
+      const rect = labelBox.current?.getBoundingClientRect()
+      if (rect) {
+        for (const u of units) {
+          const el = labelRefs.current.get(u.index)
+          if (!el) continue
+          rotulo.set(UNIT_W / 2 + 0.22, u.mesh.position.y, saida[u.index])
+          rotulo.applyMatrix4(rig.worldMatrix)
+          camera.project(rotulo)
+          if (rotulo.z > 1) { el.style.opacity = '0'; continue }
+          const sx = (rotulo.x * 0.5 + 0.5) * rect.width
+          const sy = (-rotulo.y * 0.5 + 0.5) * rect.height
+          el.style.transform = 'translate(0,-50%) translate('
+            + sx.toFixed(1) + 'px,' + sy.toFixed(1) + 'px)'
+          // Some quando a peca gira para tras da tela, senao o nome flutua
+          // sobre o rack e mente sobre de quem ele e.
+          el.style.opacity = Math.cos(yaw) > -0.2 ? '1' : '0'
+        }
+      }
     }
     raf = requestAnimationFrame(frame)
 
@@ -538,17 +570,26 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
     const unit = rack.units[index]
     setSelected(index)
 
-    if (unit.status === 'falha') {
+    if (unit.culpado) {
       const next = [...live.current.found, index]
       setFound(next)
+      setErro(null)
       golpe.current?.(index, true)
       fx.hit()
       if (next.length >= alvos) setTimeout(() => finish(1), 900)
-    } else {
-      golpe.current?.(index, false)
-      fx.miss()
-      onPenalty()
+      return
     }
+
+    golpe.current?.(index, false)
+    fx.miss()
+    onPenalty()
+    // Diz POR QUE aquela peca nao serve, nao so que errou. E a diferenca
+    // entre ensinar a ler o chamado e mandar chutar de novo.
+    setErro(unit.porQueNao
+      ?? (unit.status === 'ok'
+        ? unit.name + ' está operando normalmente. Procure entre as que acusam problema.'
+        : unit.name + ' não tem relação com o que o chamado descreve.'))
+    setTimeout(() => setErro(null), 3600)
   }
 
   const sel = selected != null ? rack.units[selected] : null
@@ -556,8 +597,59 @@ export function Rack({ rack, secondsLeft, onDone, onPenalty }: {
   return (
     <div className="desafio-2 grid h-full grid-cols-1 gap-4 px-4 pb-4 amplo:grid-cols-[1fr_340px] amplo:gap-8 amplo:px-10 amplo:pb-6">
       {/* --------------------------------------------------------- o rack 3D */}
-      <div className="sala-3d relative min-h-0">
+      <div ref={labelBox} className="sala-3d relative min-h-0">
         <div ref={hostRef} className="absolute inset-0" />
+
+        {/* O nome de cada peca, colado nela. Tambem e botao: alvo bem maior
+            que a caixa no 3D, e o jeito natural de escolher lendo. */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {rack.units.map((u, i) => {
+            const feito = found.includes(i)
+            return (
+              <button
+                key={u.name + ':' + i}
+                type="button"
+                ref={el => { if (el) labelRefs.current.set(i, el); else labelRefs.current.delete(i) }}
+                onPointerDown={() => pick(i)}
+                className="pointer-events-auto absolute left-0 top-0 whitespace-nowrap px-2 py-1 text-left outline-none"
+                style={{
+                  willChange: 'transform',
+                  opacity: 0,
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 13,
+                  letterSpacing: '.04em',
+                  color: feito ? 'var(--color-signal-green)' : 'var(--color-label)',
+                  border: '1px solid ' + (feito ? 'var(--color-signal-green)' : 'rgba(33,200,246,.22)'),
+                  background: feito ? 'rgba(37,223,160,.16)' : 'rgba(8,11,30,.86)',
+                  transition: 'color .2s, border-color .2s, background .2s',
+                }}
+              >
+                {u.name}
+              </button>
+            )
+          })}
+        </div>
+
+        <AnimatePresence>
+          {erro && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              className="pointer-events-none absolute inset-x-0 top-2 flex justify-center px-2"
+            >
+              <div
+                className="flex max-w-xl items-start gap-2.5 px-5 py-2.5"
+                style={{
+                  border: '1px solid var(--color-signal-amber)',
+                  background: 'rgba(8,11,30,.94)',
+                  color: 'var(--color-signal-amber)', fontSize: 15, lineHeight: 1.4,
+                }}
+              >
+                <TriangleAlert size={17} className="mt-0.5 shrink-0" />
+                {erro}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Affordance de giro. Some assim que a pessoa gira. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-1 flex flex-col items-center gap-2">

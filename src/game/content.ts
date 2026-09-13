@@ -433,6 +433,18 @@ export interface RackUnit {
   /** Em que face o estado aparece. 'tras' obriga a girar o rack. */
   face: 'frente' | 'tras'
   detail: string
+  /**
+   * Esta unidade explica o problema descrito na pergunta?
+   *
+   * Existe porque antes a resposta era a propria COR: a unica luz vermelha
+   * era a resposta, e o desafio virava combinar cor, coisa que uma crianca
+   * de quatro anos faz. Agora varias luzes estao vermelhas ao mesmo tempo,
+   * como num rack de verdade, e quem decide e o NOME da peca contra o que o
+   * chamado diz. Continua sem exigir conhecimento de TI: basta ler.
+   */
+  culpado?: boolean
+  /** Por que esta peca NAO explica o chamado. Dito no erro. */
+  porQueNao?: string
 }
 
 export interface RackCase {
@@ -449,33 +461,61 @@ export const RACK_CASES: RackCase[] = [
   {
     difficulty: 'medio',
     label: 'Rack de rede',
-    question: 'Um equipamento do rack está em falha.',
+    question: 'A expedição não consegue emitir nota. Qual equipamento explica isso?',
     units: [
-      ok('SWITCH-01', 'Operando. 48 portas ativas.'),
-      ok('SWITCH-02', 'Operando. 48 portas ativas.'),
-      ok('SWITCH-03', 'Operando. 24 portas ativas.'),
-      { name: 'FIREWALL', status: 'falha', face: 'frente', detail: 'Sem resposta. É por aqui que a internet inteira da fábrica passa.' },
+      ok('SWITCH-ESCRITÓRIO', 'Operando. 48 portas ativas.'),
+      {
+        name: 'SWITCH-EXPEDIÇÃO', status: 'falha', face: 'frente',
+        culpado: true,
+        detail: 'Sem resposta. É por aqui que os computadores da expedição falam com o sistema.',
+      },
+      ok('SWITCH-PRODUÇÃO', 'Operando. 48 portas ativas.'),
+      {
+        name: 'GRAVADOR-CFTV', status: 'falha', face: 'frente',
+        porQueNao: 'O gravador está mesmo com defeito, mas ele só guarda vídeo das câmeras. Nota fiscal não passa por aqui.',
+        detail: 'Disco com defeito. As câmeras pararam de gravar.',
+      },
       ok('ROTEADOR', 'Operando. Link principal ativo.'),
       ok('PATCH-A', 'Passivo. Só organiza cabo, não liga na tomada.'),
       ok('PATCH-B', 'Passivo. Só organiza cabo, não liga na tomada.'),
-      ok('GRAVADOR-CFTV', 'Operando. 24 câmeras gravando.'),
+      {
+        name: 'CONTROLADOR-PONTO', status: 'falha', face: 'frente',
+        porQueNao: 'Está fora do ar, e o relógio de ponto realmente parou. Mas isso é RH, não tem relação com a emissão de nota.',
+        detail: 'Fora do ar. O relógio de ponto não registra entrada.',
+      },
       ok('NOBREAK', 'Bateria em 98%.'),
     ],
   },
   {
     difficulty: 'dificil',
     label: 'Rack de produção',
-    question: 'Duas unidades estão em falha. Uma delas não aparece de frente.',
+    question: 'O apontamento da fábrica parou E o backup da noite falhou. Ache as duas causas. Uma não aparece de frente.',
     units: [
       ok('APP-01', 'Operando. Carga normal.'),
-      { name: 'BANCO-01', status: 'falha', face: 'frente', detail: 'Disco cheio. Foi o que derrubou o apontamento da fábrica.' },
+      {
+        name: 'BANCO-APONTAMENTO', status: 'falha', face: 'frente',
+        culpado: true,
+        detail: 'Disco cheio. É o banco onde a produção grava cada peça apontada.',
+      },
       ok('APP-02', 'Operando. Carga normal.'),
-      ok('APP-03', 'Operando. Carga normal.'),
+      {
+        name: 'IMPRESSORA-ETIQUETA', status: 'falha', face: 'frente',
+        porQueNao: 'A impressora está fora mesmo, e falta etiqueta na linha. Mas ela não grava apontamento nem faz cópia de segurança.',
+        detail: 'Sem papel e sem resposta. As etiquetas pararam.',
+      },
       ok('STORAGE', 'Operando. 62% usado.'),
-      { name: 'BANCO-02', status: 'falha', face: 'tras', detail: 'Cabo de rede solto na traseira. De frente, a luz parecia normal.' },
-      ok('BACKUP', 'Última cópia às 02:08.'),
+      {
+        name: 'SERVIDOR-BACKUP', status: 'falha', face: 'tras',
+        culpado: true,
+        detail: 'Cabo de rede solto na traseira. De frente, a luz parecia normal. Sem rede, não há cópia.',
+      },
       ok('SWITCH-A', 'Operando. 48 portas ativas.'),
       ok('SWITCH-B', 'Operando. 48 portas ativas.'),
+      {
+        name: 'GRAVADOR-CFTV', status: 'atencao', face: 'frente',
+        porQueNao: 'Amarelo é aviso, não falha. E câmera não tem nada a ver com apontamento nem com backup.',
+        detail: 'Aviso: 88% do disco de vídeo usado.',
+      },
       ok('PATCH-A', 'Passivo. Só organiza cabo.'),
       ok('NOBREAK', 'Bateria em 96%.'),
     ],
@@ -483,19 +523,47 @@ export const RACK_CASES: RackCase[] = [
   {
     difficulty: 'critico',
     label: 'Rack principal',
-    question: 'Três unidades em falha. Amarelo é aviso, não falha.',
+    question: 'A fábrica inteira perdeu o sistema, e não há cópia de ontem. Três equipamentos explicam isso. Amarelo é aviso, não falha.',
     units: [
-      { name: 'HIPERVISOR', status: 'falha', face: 'tras', detail: 'Fonte redundante desligada na traseira. O servidor está sem proteção.' },
+      {
+        name: 'HIPERVISOR', status: 'falha', face: 'tras',
+        culpado: true,
+        detail: 'Fonte desligada na traseira. É a máquina que roda todos os servidores da empresa.',
+      },
       ok('APP-01', 'Operando.'),
-      { name: 'BANCO-01', status: 'atencao', face: 'frente', detail: 'Aviso: 81% de disco. Incomoda, mas não é falha.' },
+      {
+        name: 'BANCO-ERP', status: 'atencao', face: 'frente',
+        porQueNao: 'Amarelo é aviso: 81% de disco incomoda, mas o banco continua respondendo.',
+        detail: 'Aviso: 81% de disco.',
+      },
       ok('APP-02', 'Operando.'),
-      { name: 'SWITCH-CORE', status: 'falha', face: 'frente', detail: 'Porta principal caída. Metade da rede saiu do ar.' },
+      {
+        name: 'SWITCH-CORE', status: 'falha', face: 'frente',
+        culpado: true,
+        detail: 'Porta principal caída. É por onde toda a rede da fábrica passa.',
+      },
       ok('STORAGE', 'Operando. 58% usado.'),
-      ok('SWITCH-B', 'Operando. 48 portas ativas.'),
-      { name: 'NOBREAK', status: 'atencao', face: 'frente', detail: 'Aviso: bateria em 41%. Ainda segura uma queda.' },
-      { name: 'BACKUP', status: 'falha', face: 'tras', detail: 'Disco de backup removido. Não havia cópia desde ontem.' },
+      {
+        name: 'CONTROLADOR-PONTO', status: 'falha', face: 'frente',
+        porQueNao: 'Está fora, e ninguém bate ponto. Mas o sistema da fábrica e o backup não dependem dele.',
+        detail: 'Fora do ar. O relógio de ponto não registra.',
+      },
+      {
+        name: 'NOBREAK', status: 'atencao', face: 'frente',
+        porQueNao: 'Amarelo é aviso: 41% de bateria ainda segura uma queda de energia.',
+        detail: 'Aviso: bateria em 41%.',
+      },
+      {
+        name: 'SERVIDOR-BACKUP', status: 'falha', face: 'tras',
+        culpado: true,
+        detail: 'Disco de backup removido da traseira. Não havia cópia desde ontem.',
+      },
       ok('APP-03', 'Operando.'),
-      ok('GRAVADOR-CFTV', 'Operando. 24 câmeras gravando.'),
+      {
+        name: 'GRAVADOR-CFTV', status: 'falha', face: 'frente',
+        porQueNao: 'Quebrado de verdade, e as câmeras pararam. Mas câmera não derruba sistema nem apaga backup.',
+        detail: 'Disco com defeito. As câmeras pararam de gravar.',
+      },
       ok('PATCH-A', 'Passivo. Só organiza cabo.'),
     ],
   },

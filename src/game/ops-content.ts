@@ -132,22 +132,38 @@ export const SEGURANCA_CASES: SegurancaCase[] = [
     difficulty: 'dificil',
     label: 'Acesso de fora',
     question: 'Um destes acessos não é de quem diz ser.',
+    // Dez acessos espalhados pelo pais de proposito: representante em Recife,
+    // compras em Sao Paulo, fabrica em Joinville. E o que faz o globo virar
+    // mapa de operacao em vez de bola com um pontinho.
+    // A pista continua sendo UMA so: a mesma pessoa em dois lugares longe
+    // demais, rapido demais. O resto e cenario.
     acessos: [
-      { id: '1', usuario: 'CARLOS M.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(8, 12) },
+      { id: '1', usuario: 'CARLOS M.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(7, 58) },
       { id: '2', usuario: 'MARIA S.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(8, 31) },
-      { id: '3', usuario: 'CARLOS M.', cidade: 'São Paulo, SP', lat: -23.5, lon: -46.6, hora: hm(14, 5) },
+      { id: '3', usuario: 'ANA P.', cidade: 'Curitiba, PR', lat: -25.4, lon: -49.3, hora: hm(8, 47) },
+      { id: '4', usuario: 'RENATO F.', cidade: 'Recife, PE', lat: -8.05, lon: -34.9, hora: hm(8, 55) },
+      // Repeticao legitima: mesma pessoa, mesma cidade, uma hora depois.
+      // Esta aqui de proposito. Se aparecer duas vezes ja fosse resposta, o
+      // desafio seria contar nomes em vez de pensar.
+      { id: '5', usuario: 'CARLOS M.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(9, 2) },
       {
-        id: '4', usuario: 'MARIA S.', cidade: 'Kiev, Ucrânia', lat: 50.4, lon: 30.5, hora: hm(9, 6),
+        id: '6', usuario: 'MARIA S.', cidade: 'Kiev, Ucrânia', lat: 50.4, lon: 30.5, hora: hm(9, 6),
         invasor: true,
         why: 'MARIA S. entrou de Joinville às 08:31 e reaparece em Kiev às 09:06. Ninguém atravessa o mundo em 35 minutos: a senha dela vazou.',
       },
-      { id: '5', usuario: 'ANA P.', cidade: 'Curitiba, PR', lat: -25.4, lon: -49.3, hora: hm(9, 40) },
+      { id: '7', usuario: 'JOÃO R.', cidade: 'Blumenau, SC', lat: -26.9, lon: -49.1, hora: hm(9, 20) },
+      // Segunda repeticao legitima.
+      { id: '8', usuario: 'ANA P.', cidade: 'Curitiba, PR', lat: -25.4, lon: -49.3, hora: hm(10, 15) },
+      { id: '9', usuario: 'PEDRO L.', cidade: 'São Paulo, SP', lat: -23.5, lon: -46.6, hora: hm(11, 4) },
+      { id: '10', usuario: 'LÚCIA T.', cidade: 'Manaus, AM', lat: -3.1, lon: -60.0, hora: hm(13, 40) },
     ],
   },
   {
     difficulty: 'critico',
-    label: 'Madrugada suspeita',
+    label: 'Dois de fora',
     question: 'Dois acessos não deveriam existir. Ache os dois.',
+    // Doze acessos, doze arcos. Dois pares impossiveis, e a mesma regra
+    // aprendida na etapa anterior resolve os dois.
     acessos: [
       { id: '1', usuario: 'CARLOS M.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(7, 55) },
       {
@@ -155,14 +171,20 @@ export const SEGURANCA_CASES: SegurancaCase[] = [
         invasor: true,
         why: 'CARLOS M. estava em Joinville 25 minutos antes. Dois continentes na mesma manhã não existe.',
       },
-      { id: '3', usuario: 'ANA P.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(9, 10) },
-      { id: '4', usuario: 'MARIA S.', cidade: 'São Paulo, SP', lat: -23.5, lon: -46.6, hora: hm(10, 2) },
+      { id: '3', usuario: 'ANA P.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(8, 40) },
+      { id: '4', usuario: 'RENATO F.', cidade: 'Recife, PE', lat: -8.05, lon: -34.9, hora: hm(8, 52) },
+      { id: '5', usuario: 'MARIA S.', cidade: 'São Paulo, SP', lat: -23.5, lon: -46.6, hora: hm(9, 10) },
+      { id: '6', usuario: 'JOÃO R.', cidade: 'Blumenau, SC', lat: -26.9, lon: -49.1, hora: hm(9, 35) },
       {
-        id: '5', usuario: 'ADMIN', cidade: 'Hanói, Vietnã', lat: 21.0, lon: 105.8, hora: hm(3, 14),
+        id: '7', usuario: 'MARIA S.', cidade: 'Hanói, Vietnã', lat: 21.0, lon: 105.8, hora: hm(9, 48),
         invasor: true,
-        why: 'Conta de administrador, às 03:14 da manhã, do outro lado do mundo. Nenhuma das três coisas combina com a rotina da fábrica.',
+        why: 'MARIA S. estava em São Paulo às 09:10 e aparece em Hanói 38 minutos depois, do outro lado do planeta.',
       },
-      { id: '6', usuario: 'JOÃO R.', cidade: 'Blumenau, SC', lat: -26.9, lon: -49.1, hora: hm(11, 25) },
+      { id: '8', usuario: 'ANA P.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(10, 2) },
+      { id: '9', usuario: 'LÚCIA T.', cidade: 'Manaus, AM', lat: -3.1, lon: -60.0, hora: hm(10, 25) },
+      { id: '10', usuario: 'PEDRO L.', cidade: 'Porto Alegre, RS', lat: -30.0, lon: -51.2, hora: hm(11, 30) },
+      { id: '11', usuario: 'RENATO F.', cidade: 'Recife, PE', lat: -8.05, lon: -34.9, hora: hm(12, 48) },
+      { id: '12', usuario: 'JOÃO R.', cidade: 'Joinville, SC', lat: -26.3, lon: -48.8, hora: hm(13, 15) },
     ],
   },
 ]

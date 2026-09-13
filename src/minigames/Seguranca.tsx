@@ -17,7 +17,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { Renderer, Camera, Transform, Box, Sphere, Program, Mesh, Raycast, Vec2, Vec3 } from 'ogl'
+import { Renderer, Camera, Transform, Box, Sphere, Program, Mesh, Raycast, Vec2, Vec3, Polyline, Color } from 'ogl'
 import { PALETA, PISO_VERT, PISO_FRAG } from '../visual/palette.glsl.ts'
 import { criarJuice } from '../visual/juice.ts'
 import { criarDestrocos } from '../visual/debris.ts'
@@ -92,6 +92,24 @@ void main() {
   col += CIANO * sweep * 0.30;
 
   gl_FragColor = vec4(col, 1.0);
+}
+`
+
+/**
+ * Arco de conexao. Um por acesso, ligando a origem ate a sede.
+ *
+ * Sem ele o globo era uma bola com pontinhos: o que conta a historia de
+ * "todo mundo entrando no nosso sistema" e ver as linhas convergindo. Some
+ * nas duas pontas para nascer no acesso e morrer na sede sem borda dura.
+ */
+const ARCO_FRAG = /* glsl */ `
+precision mediump float;
+uniform vec3 uColor;
+uniform float uFade;
+varying vec2 vUv;
+void main() {
+  float ponta = smoothstep(0.0, 0.10, vUv.y) * smoothstep(1.0, 0.90, vUv.y);
+  gl_FragColor = vec4(uColor, uFade * ponta);
 }
 `
 
@@ -280,8 +298,21 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
     sede.setParent(rig)
 
     /* ------------------------------------------ acessos, arcos e pacotes */
+    // Sete dos nove acessos sao da mesma regiao, entao caem no mesmo ponto da
+    // esfera e viram UM marcador, nao sete. O afastamento e minusculo (bem
+    // menos que a largura do estado) e existe so para o olho separar os
+    // pontos: quem e da mesma cidade fica num cachinho, que e a verdade.
+    const porCidade = new Map<string, number>()
     const marks = seg.acessos.map(ac => {
-      const p = naEsfera(ac.lat, ac.lon)
+      const chave = ac.lat + ',' + ac.lon
+      const n = porCidade.get(chave) ?? 0
+      porCidade.set(chave, n + 1)
+      const anel = n === 0 ? 0 : 0.55 + (n - 1) * 0.12
+      const giro = n * 2.4
+      const p = naEsfera(
+        ac.lat + Math.sin(giro) * anel,
+        ac.lon + Math.cos(giro) * anel,
+      )
 
       const mesh = new Mesh(gl, { geometry: markGeo, program: mkProgram(CIANO) })
       mesh.position.copy(p)
@@ -295,7 +326,22 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
         return { mesh: d, offset: k / PACOTES }
       })
 
-      return { mesh, dots, ac, origem: p }
+      // O arco desenhado. Vinte e seis pontos bastam para a curva ficar lisa
+      // no tamanho em que o globo aparece.
+      const linha = new Polyline(gl, {
+        points: Array.from({ length: 26 }, (_, i) => noArco(p, posSede, i / 25)),
+        fragment: ARCO_FRAG,
+        uniforms: {
+          uColor: { value: new Color(0.129, 0.784, 0.965) },
+          uFade: { value: 0.34 },
+          uThickness: { value: 1.8 },
+        },
+      })
+      linha.mesh.program.transparent = true
+      linha.mesh.program.depthWrite = false
+      linha.mesh.setParent(rig)
+
+      return { mesh, dots, ac, origem: p, linha }
     })
 
     function resize() {
@@ -311,6 +357,9 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
       camera.position.set(0, 0, dist)
       camera.lookAt([0, 0, 0])
       juice.ancorar(camera)
+      // A espessura da Polyline e em pixel de tela, entao ela precisa saber
+      // o tamanho do canvas a cada redimensionamento.
+      for (const m of marks) m.linha.resize()
     }
     const ro = new ResizeObserver(resize)
     ro.observe(host)
@@ -394,6 +443,11 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
         u.uResolved.value = achado ? 1 : 0
         u.uPulse.value = 1
 
+        // O arco do acesso escolhido acende; o resto fica de fundo. Assim a
+        // tela fica cheia sem competir com a decisao.
+        const aceso = live.current.selected === m.ac.id || achado
+        m.linha.mesh.program.uniforms.uFade.value = aceso ? 1.0 : 0.30
+
         for (const d of m.dots) {
           const k = (t * 0.22 + d.offset) % 1
           const p = noArco(m.origem, posSede, k)
@@ -418,6 +472,8 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
           // Atras do globo: o rotulo some junto com o ponto, senao o texto
           // flutua sobre o planeta e mente sobre onde aquilo esta.
           const atras = tmp.z > 0.985
+          const mostrar = live.current.selected === m.ac.id || live.current.found.includes(m.ac.id)
+          if (!mostrar) { el.style.opacity = '0'; el.style.pointerEvents = 'none'; continue }
           if (atras) { el.style.opacity = '0'; el.style.pointerEvents = 'none'; continue }
           const sx = (tmp.x * 0.5 + 0.5) * rect.width
           const sy = (-tmp.y * 0.5 + 0.5) * rect.height
@@ -550,7 +606,7 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
           ))}
         </div>
 
-        <div className="mb-5 flex items-center gap-2.5">
+        <div className="mb-3 flex items-center gap-2.5">
           <span
             className="h-3 w-3"
             style={{ background: 'rgb(255,212,61)', boxShadow: '0 0 10px rgb(255,212,61)' }}
@@ -560,10 +616,63 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
           </span>
         </div>
 
-        <p className="mb-5 text-[15px] leading-relaxed" style={{ color: 'var(--color-label)' }}>
-          Nenhum acesso vem marcado como invasor. O que denuncia é comparar
-          nome, lugar e horário entre si.
-        </p>
+        {/* O registro de acessos.
+            O globo mostra DE ONDE cada acesso veio, que e o que faz a cena
+            existir. Mas comparar dez pontos girando em volta de uma esfera
+            seria trabalho de paciencia, nao de raciocinio. A lista em ordem
+            de horario e a ferramenta: e como um log de verdade se le, e nela
+            o par impossivel salta em uma passada de olho.
+            Cada linha tambem e botao, e alvo bem maior que o ponto no globo. */}
+        <div className="mb-3 flex items-center justify-between">
+          <HudLabel>Registro de entradas</HudLabel>
+          <span className="tnum text-[13px]" style={{ color: 'var(--color-micro)' }}>
+            {seg.acessos.length} hoje
+          </span>
+        </div>
+
+        <div className="mb-4 min-h-0 flex-1 overflow-y-auto pr-1">
+          {[...seg.acessos].sort((a, b) => a.hora - b.hora).map(ac => {
+            const achado = found.includes(ac.id)
+            const escolhido = selected === ac.id
+            return (
+              <button
+                key={ac.id}
+                type="button"
+                onPointerDown={() => pick(ac)}
+                className="mb-1 flex w-full items-baseline gap-2.5 px-2.5 py-2 text-left outline-none"
+                style={{
+                  border: '1px solid ' + (achado
+                    ? 'var(--color-signal-green)'
+                    : escolhido ? 'var(--color-cyan-core)' : 'transparent'),
+                  background: achado
+                    ? 'rgba(37,223,160,.14)'
+                    : escolhido ? 'rgba(33,200,246,.10)' : 'rgba(14,19,48,.5)',
+                }}
+              >
+                <span
+                  className="tnum shrink-0 text-[14px]"
+                  style={{ color: achado ? 'var(--color-signal-green)' : 'var(--color-cyan-brand)' }}
+                >
+                  {relogio(ac.hora)}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span
+                    className="block truncate text-[14px]"
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      color: achado ? 'var(--color-signal-green)' : '#EAFBFF',
+                    }}
+                  >
+                    {ac.usuario}
+                  </span>
+                  <span className="block truncate text-[13px]" style={{ color: 'var(--color-micro)' }}>
+                    {ac.cidade}
+                  </span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
 
         <button
           type="button"

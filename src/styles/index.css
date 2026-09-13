@@ -7,7 +7,7 @@
    tela inteira e ainda obriga a rolar para alcancar o proprio desafio. */
 @custom-variant amplo {
   @media (min-width: 1024px) { @slot }
-  @media (min-width: 600px) and (orientation: landscape) { @slot }
+  @media (min-width: 480px) and (orientation: landscape) { @slot }
 }
 
 /* ==========================================================================
@@ -311,6 +311,120 @@
   [data-touch-target] {
     min-height: 60px;
   }
+
+  /* O MIOLO ROLA POR DENTRO.
+
+     Grade nao recorta nada: um filho mais alto que a linha simplesmente
+     invade a linha de baixo. Num celular deitado de 320 de altura isso fez
+     o rodape ser desenhado POR CIMA do titulo e do botao de iniciar, que
+     ficou inalcancavel mesmo estando visivel.
+
+     min-height: 0 e o que permite a linha encolher (filho de grade nasce
+     com min-height auto, e por isso se recusa a ficar menor que o conteudo).
+     O overflow devolve o acesso ao que sobrou. */
+  .rola-miolo {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* Vale para os doze desafios, nas duas orientacoes: cada faixa rola por
+     dentro em vez de transbordar por cima da faixa de baixo. Sem isto, na
+     triagem o cartao do chamado era desenhado em cima dos tres botoes de
+     resposta, e a pessoa tocava no texto achando que tocava no botao.
+     A cena 3D fica de fora: arrastar ali e girar o cenario, e uma rolagem
+     roubaria o gesto. */
+  .desafio-1 > *,
+  .desafio-2 > *:not(.sala-3d) {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .desafio-2 > .sala-3d {
+    min-height: 0;
+  }
+
+  /* Tela muito baixa (celular deitado): o enfeite sai e o resto encolhe.
+     Numa altura de 320px cada linha decide se o botao principal aparece
+     sem rolar, e numa tela inicial de quiosque ele TEM que aparecer. */
+  @media (max-height: 430px) {
+    .so-tela-alta {
+      display: none !important;
+    }
+
+    /* O titulo cede espaco primeiro: continua enorme para quem passa no
+       corredor, sem empurrar a acao para fora da tela. */
+    h1 {
+      font-size: clamp(26px, 6vw, 132px) !important;
+      line-height: 1 !important;
+    }
+
+    .hold-iniciar {
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+    }
+
+    /* O rotulo cabe numa linha so. Quebrado em tres, o botao ficava com 95px
+       de altura e nao cabia na tela deitada. */
+    .hold-rotulo {
+      font-size: 15px !important;
+      letter-spacing: .06em !important;
+    }
+
+    /* O cabecalho do jogo cede o que for enfeite. Numa tela de 390px ele
+       estava comendo 220 e sobrava nada para o proprio desafio: o cartao do
+       chamado ficava fora da vista, e ninguem responde o que nao le. */
+    .hud-jogo {
+      padding-top: 6px !important;
+    }
+
+    .hud-sub {
+      display: none !important;
+    }
+
+    .hud-jogo h2 {
+      font-size: 17px !important;
+      line-height: 1.1 !important;
+    }
+
+    /* O desafio devolve respiro para o conteudo.
+       Medido a 844x390: a pergunta, os botoes de resposta e o rodape somavam
+       exatamente a altura disponivel, e a faixa do meio (o chamado que
+       precisa ser lido) ficava com ZERO pixel. Ninguem responde o que nao ve.
+       Entao o respiro encolhe e o alvo de toque para no minimo do dedo. */
+    .desafio-1,
+    .desafio-2 {
+      padding-bottom: 8px !important;
+    }
+
+    .desafio-1 [data-touch-target],
+    .desafio-2 [data-touch-target] {
+      min-height: 48px !important;
+    }
+
+    .desafio-1 [data-touch-target] {
+      padding-top: 8px !important;
+      padding-bottom: 8px !important;
+    }
+
+    /* A pergunta do desafio encolhe: ela e a mesma o tempo todo, enquanto o
+       conteudo logo abaixo muda a cada rodada e e o que precisa ser lido. */
+    .desafio-1 > *:first-child {
+      font-size: 15px !important;
+      line-height: 1.2 !important;
+    }
+
+    /* O contador de acertos sai: a mesma informacao ja esta no cabecalho,
+       em SISTEMA RESTAURADO e no FILA x de y. */
+    .desafio-1 > .conta-acertos {
+      display: none !important;
+    }
+
+    /* O chamado inteiro precisa caber sem rolar: e a frase que decide a
+       resposta. Fonte de monitor de 24 polegadas nao serve aqui. */
+    .texto-chamado {
+      font-size: 17px !important;
+    }
+  }
 }
 
 /* ------------------------------------------------------------- EM PE
@@ -324,7 +438,7 @@
    Agora a tela tem a altura exata do aparelho. Onde o conteudo nao cabe,
    quem rola e o bloco por dentro, nunca a pagina. */
 @media (max-width: 1023px) and (orientation: portrait),
-       (max-width: 599px) {
+       (max-width: 479px) {
   html, body, #root {
     height: 100dvh;
     overflow: hidden;
@@ -380,7 +494,7 @@
    Continua quiosque: tela cheia, sem rolagem. O 3D encolhe junto em vez de
    empurrar o resto para fora, e o dvh entra no lugar do vh porque a barra
    do navegador do celular come altura de verdade. */
-@media (max-width: 1023px) and (orientation: landscape) and (min-width: 600px) {
+@media (max-width: 1023px) and (orientation: landscape) and (min-width: 480px) {
   html, body, #root {
     height: 100dvh;
     overflow: hidden;

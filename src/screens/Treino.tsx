@@ -66,7 +66,7 @@ export function Treino({ onEscolher, onVoltar }: {
         </p>
       </header>
 
-      <div className="min-h-0 overflow-y-auto py-5">
+      <div className="rola-miolo min-h-0 overflow-y-auto py-5">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 amplo:grid-cols-3">
           {FICHAS.map((f, i) => (
             <motion.button

@@ -71,14 +71,14 @@ export function Attract({ runs, onStart, onRuns, onTreino }: {
       {/* ------------------------------------------------------------ centro */}
       {/* min-w-0: sem isto o titulo gigante recusa encolher e empurra a coluna
           do ranking para fora da tela. Filho de grid tem min-width:auto por padrao. */}
-      <section className="grid min-h-0 grid-cols-1 items-center gap-6 amplo:grid-cols-[1.15fr_.85fr] amplo:gap-14">
+      <section className="rola-miolo grid min-h-0 grid-cols-1 items-center gap-6 amplo:grid-cols-[1.15fr_.85fr] amplo:gap-14">
         <div className="min-w-0">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE_OUT }}
           >
-            <HudLabel className="mb-4">Protocolo de emergência</HudLabel>
+            <HudLabel className="so-tela-alta mb-4">Protocolo de emergência</HudLabel>
 
             <h1
               className="leading-[0.88]"
@@ -97,7 +97,7 @@ export function Attract({ runs, onStart, onRuns, onTreino }: {
             </h1>
 
             <div
-              className="mt-3"
+              className="so-tela-alta mt-3"
               style={{
                 fontFamily: 'var(--font-mono)', fontSize: 'clamp(14px, 2.2vw, 30px)',
                 letterSpacing: '.22em', color: 'var(--color-label)',
@@ -106,14 +106,14 @@ export function Attract({ runs, onStart, onRuns, onTreino }: {
               <EncryptedText text="SALVE O SISTEMA" revealDelayMs={70} flipDelayMs={40} />
             </div>
 
-            <Rule className="my-7 max-w-lg" />
+            <Rule className="so-tela-alta my-7 max-w-lg" />
 
-            <p className="max-w-lg text-[17px] leading-relaxed" style={{ color: 'var(--color-label)' }}>
+            <p className="so-tela-alta max-w-lg text-[17px] leading-relaxed" style={{ color: 'var(--color-label)' }}>
               Um pedido travou e a fábrica parou. Quatro desafios, dois minutos,
               e o sistema volta ao ar. Ou não.
             </p>
 
-            <div className="mt-9">
+            <div className="mt-5 amplo:mt-9">
               <HoldToStart onConfirm={onStart} />
             </div>
           </motion.div>
@@ -186,7 +186,7 @@ export function Attract({ runs, onStart, onRuns, onTreino }: {
       )}
 
       {/* ---------------------------------------------------- faixa inferior */}
-      <footer className="flex items-end justify-between">
+      <footer className="so-tela-alta flex items-end justify-between">
         <div className="flex flex-wrap gap-6 amplo:gap-12">
           <Stat label="Jogadores hoje" value={s.played} />
           <Stat label="Equipes" value={s.teams} />

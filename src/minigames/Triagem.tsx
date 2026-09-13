@@ -94,7 +94,7 @@ export function Triagem({ tickets, secondsLeft, onDone, onPenalty }: {
             >
               <Panel className="px-4 amplo:px-10 py-9" tone={feedback ? (feedback.ok ? 'green' : 'red') : 'cyan'}>
                 <HudLabel className="mb-3">Chamado aberto agora</HudLabel>
-                <p style={{ fontSize: 'clamp(14px, 3.73vw, 30px)', lineHeight: 1.3 }}>{ticket.text}</p>
+                <p className="texto-chamado" style={{ fontSize: 'clamp(14px, 3.73vw, 30px)', lineHeight: 1.3 }}>{ticket.text}</p>
 
                 <AnimatePresence>
                   {feedback && (
@@ -157,7 +157,7 @@ export function Triagem({ tickets, secondsLeft, onDone, onPenalty }: {
         })}
       </div>
 
-      <div className="pt-3 text-center">
+      <div className="conta-acertos pt-3 text-center">
         <HudLabel>Acertos: {correct} de {tickets.length}</HudLabel>
       </div>
     </div>

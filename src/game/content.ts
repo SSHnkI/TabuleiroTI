@@ -51,7 +51,10 @@ export const SCANNER_CASES: ScannerCase[] = [
       },
       { id: 'cidade', label: 'Cidade', value: 'Joinville / SC' },
       { id: 'fone', label: 'Telefone', value: '(47) 3422-1180', mono: true },
+      { id: 'ie', label: 'Inscrição estadual', value: '255.417.880', mono: true },
       { id: 'vend', label: 'Vendedor', value: 'Carlos M.' },
+      { id: 'cond', label: 'Condição de pagamento', value: '28 dias' },
+      { id: 'abertura', label: 'Cadastrado em', value: '14/03/2024', mono: true },
     ],
   },
   {
@@ -140,9 +143,9 @@ export const FIREWALL_LIVES = 3
 
 /** Quanto mais critico, mais senhas e mais rapido. */
 export const FIREWALL_TUNING: Partial<Record<Difficulty, { drops: number; speed: number }>> = {
-  medio: { drops: 12, speed: 1 },
-  dificil: { drops: 16, speed: 1.2 },
-  critico: { drops: 20, speed: 1.45 },
+  medio: { drops: 16, speed: 1 },
+  dificil: { drops: 22, speed: 1.2 },
+  critico: { drops: 28, speed: 1.45 },
 }
 
 /* ==================================================================== FLUXO
@@ -229,10 +232,14 @@ export const TIMELINE_CASES: TimelineCase[] = [
     perfect: 1.5, zero: 9,
     answer: 'A integração do cartão gravou parcelas = 0 às 10:33.',
     events: [
+      { at: 2, label: '10:12', detail: 'Cliente entrou no portal.' },
       { at: 5, label: '10:15', detail: 'Pedido criado pelo vendedor.' },
+      { at: 9, label: '10:19', detail: 'Estoque reservado para o pedido.' },
+      { at: 14, label: '10:24', detail: 'Análise de crédito aprovada.' },
       { at: 22, label: '10:32', detail: 'Pagamento autorizado pela operadora.' },
       { at: 23, label: '10:33', detail: 'Integração do cartão gravou parcelas = 0.', failure: true },
       { at: 24, label: '10:34', detail: 'Pedido bloqueado por quantidade inválida.' },
+      { at: 27, label: '10:37', detail: 'Vendedor abriu chamado no suporte.' },
     ],
   },
   {
@@ -285,16 +292,25 @@ export const TICKETS: Ticket[] = [
   { text: 'Recebi um e-mail pedindo a senha e cliquei no link.', priority: 'P1', why: 'Suspeita de vazamento é P1, mesmo sem prejuízo visível ainda.' },
   { text: 'Nenhuma nota fiscal está sendo emitida desde as 8h.', priority: 'P1', why: 'Faturamento parado trava o caixa da empresa.' },
   { text: 'Ninguém da expedição consegue acessar o sistema.', priority: 'P1', why: 'Um setor inteiro impedido de trabalhar.' },
+  { text: 'A injetora 3 parou: o sistema não libera a ordem.', priority: 'P1', why: 'Máquina parada é dinheiro parado, e a fila atrás dela para junto.' },
+  { text: 'Apareceu um aviso pedindo resgate em bitcoin no PC do financeiro.', priority: 'P1', why: 'Sinal de sequestro de dados. Desligar da rede e agir agora.' },
+  { text: 'O sistema aceitou meu login, mas mostra os dados de outra pessoa.', priority: 'P1', why: 'Dado de um aparecendo para outro é falha grave, e pode virar vazamento.' },
 
   { text: 'A impressora da expedição só imprime borrado.', priority: 'P2', why: 'Atrapalha e atrasa, mas existe contorno.' },
   { text: 'Meu computador está muito lento desde ontem.', priority: 'P2', why: 'Reduz produtividade sem impedir o trabalho.' },
   { text: 'O relatório de vendas está saindo com número errado.', priority: 'P2', why: 'Dado errado atrapalha decisão, mas o sistema opera.' },
   { text: 'A internet do escritório cai por alguns segundos.', priority: 'P2', why: 'Intermitente: incomoda bastante, mas não para tudo.' },
+  { text: 'O leitor de código de barras falha uma vez a cada dez.', priority: 'P2', why: 'Dá para repetir a leitura, mas atrasa a conferência o dia inteiro.' },
+  { text: 'A câmera da doca parou de gravar ontem à noite.', priority: 'P2', why: 'A operação segue, mas cada dia sem gravação é um dia sem prova.' },
+  { text: 'O telefone da portaria não recebe ligação externa.', priority: 'P2', why: 'Existe o celular da portaria como contorno, mas atrapalha a entrada de carga.' },
 
   { text: 'Queria um monitor maior na minha mesa.', priority: 'P3', why: 'Melhoria, não incidente.' },
   { text: 'O papel de parede do meu PC voltou ao padrão.', priority: 'P3', why: 'Estético. Não afeta trabalho nenhum.' },
   { text: 'Meu mouse está com a rodinha dura.', priority: 'P3', why: 'Incômodo pequeno, com troca simples.' },
   { text: 'Pode instalar um app de anotações no meu notebook?', priority: 'P3', why: 'Solicitação comum, sem urgência.' },
+  { text: 'Dá para aumentar a letra do sistema na minha tela?', priority: 'P3', why: 'Ajuste de conforto, resolvido em um minuto quando der.' },
+  { text: 'Quero meu nome corrigido na assinatura do e-mail.', priority: 'P3', why: 'Importante para a pessoa, mas nada para de funcionar por isso.' },
+  { text: 'Pode passar meus arquivos para a máquina nova quando sobrar tempo?', priority: 'P3', why: 'A própria pessoa já disse que pode esperar.' },
 ]
 
 export const TRIAGEM_TUNING: Partial<Record<Difficulty, number>> = {
@@ -378,11 +394,14 @@ export interface RestoreStep { id: string; label: string; icon: string }
 
 export const RESTORE_STEPS: RestoreStep[] = [
   { id: 'isolar', label: 'ISOLAR', icon: 'shield' },
+  { id: 'avisar', label: 'AVISAR', icon: 'bell' },
   { id: 'snapshot', label: 'SNAPSHOT', icon: 'camera' },
   { id: 'banco', label: 'BANCO', icon: 'database' },
   { id: 'arquivos', label: 'ARQUIVOS', icon: 'folder' },
+  { id: 'config', label: 'CONFIGURAÇÃO', icon: 'settings' },
   { id: 'servico', label: 'SERVIÇO', icon: 'server' },
   { id: 'testar', label: 'TESTAR', icon: 'check' },
+  { id: 'liberar', label: 'LIBERAR', icon: 'flag' },
 ]
 
 /** Quanto mais critico, mais longa a sequencia a memorizar. */
@@ -433,9 +452,12 @@ export const RACK_CASES: RackCase[] = [
     units: [
       ok('SWITCH-01', 'Operando. 48 portas ativas.'),
       ok('SWITCH-02', 'Operando. 48 portas ativas.'),
+      ok('SWITCH-03', 'Operando. 24 portas ativas.'),
       { name: 'FIREWALL', status: 'falha', face: 'frente', detail: 'Sem resposta. É por aqui que a internet inteira da fábrica passa.' },
       ok('ROTEADOR', 'Operando. Link principal ativo.'),
-      ok('PATCH-A', 'Passivo. Sem alimentação.'),
+      ok('PATCH-A', 'Passivo. Só organiza cabo, não liga na tomada.'),
+      ok('PATCH-B', 'Passivo. Só organiza cabo, não liga na tomada.'),
+      ok('GRAVADOR-CFTV', 'Operando. 24 câmeras gravando.'),
       ok('NOBREAK', 'Bateria em 98%.'),
     ],
   },
@@ -447,9 +469,13 @@ export const RACK_CASES: RackCase[] = [
       ok('APP-01', 'Operando. Carga normal.'),
       { name: 'BANCO-01', status: 'falha', face: 'frente', detail: 'Disco cheio. Foi o que derrubou o apontamento da fábrica.' },
       ok('APP-02', 'Operando. Carga normal.'),
+      ok('APP-03', 'Operando. Carga normal.'),
       ok('STORAGE', 'Operando. 62% usado.'),
       { name: 'BANCO-02', status: 'falha', face: 'tras', detail: 'Cabo de rede solto na traseira. De frente, a luz parecia normal.' },
       ok('BACKUP', 'Última cópia às 02:08.'),
+      ok('SWITCH-A', 'Operando. 48 portas ativas.'),
+      ok('SWITCH-B', 'Operando. 48 portas ativas.'),
+      ok('PATCH-A', 'Passivo. Só organiza cabo.'),
       ok('NOBREAK', 'Bateria em 96%.'),
     ],
   },
@@ -461,11 +487,15 @@ export const RACK_CASES: RackCase[] = [
       { name: 'HIPERVISOR', status: 'falha', face: 'tras', detail: 'Fonte redundante desligada na traseira. O servidor está sem proteção.' },
       ok('APP-01', 'Operando.'),
       { name: 'BANCO-01', status: 'atencao', face: 'frente', detail: 'Aviso: 81% de disco. Incomoda, mas não é falha.' },
+      ok('APP-02', 'Operando.'),
       { name: 'SWITCH-CORE', status: 'falha', face: 'frente', detail: 'Porta principal caída. Metade da rede saiu do ar.' },
       ok('STORAGE', 'Operando. 58% usado.'),
+      ok('SWITCH-B', 'Operando. 48 portas ativas.'),
       { name: 'NOBREAK', status: 'atencao', face: 'frente', detail: 'Aviso: bateria em 41%. Ainda segura uma queda.' },
       { name: 'BACKUP', status: 'falha', face: 'tras', detail: 'Disco de backup removido. Não havia cópia desde ontem.' },
-      ok('APP-02', 'Operando.'),
+      ok('APP-03', 'Operando.'),
+      ok('GRAVADOR-CFTV', 'Operando. 24 câmeras gravando.'),
+      ok('PATCH-A', 'Passivo. Só organiza cabo.'),
     ],
   },
 ]
@@ -517,10 +547,13 @@ export const WIFI_CASES: WifiCase[] = [
     question: 'Um ponto de acesso caiu. Ache o buraco de sinal.',
     walls: GALPAO,
     aps: [
-      { name: 'AP-ESCRITÓRIO', x: -4.4, z: -3.0, status: 'ok', range: 3.4, detail: 'Operando. 18 aparelhos conectados.' },
-      { name: 'AP-PRODUÇÃO', x: 1.0, z: -2.6, status: 'ok', range: 3.6, detail: 'Operando. 31 aparelhos conectados.' },
+      { name: 'AP-ESCRITÓRIO', x: -4.4, z: -3.0, status: 'ok', range: 3.2, detail: 'Operando. 18 aparelhos conectados.' },
+      { name: 'AP-PRODUÇÃO', x: 1.0, z: -2.6, status: 'ok', range: 3.4, detail: 'Operando. 31 aparelhos conectados.' },
       { name: 'AP-EXPEDIÇÃO', x: 4.6, z: 3.0, status: 'falha', range: 0.6, detail: 'Sem energia. A expedição inteira ficou sem coletor.' },
-      { name: 'AP-REFEITÓRIO', x: -4.2, z: 3.2, status: 'ok', range: 3.2, detail: 'Operando. 9 aparelhos conectados.' },
+      { name: 'AP-REFEITÓRIO', x: -4.2, z: 3.2, status: 'ok', range: 3.0, detail: 'Operando. 9 aparelhos conectados.' },
+      { name: 'AP-DOCA', x: 0.6, z: 4.0, status: 'ok', range: 2.8, detail: 'Operando. 6 aparelhos conectados.' },
+      { name: 'AP-ALMOXARIFADO', x: -1.8, z: 0.2, status: 'ok', range: 2.8, detail: 'Operando. 4 aparelhos conectados.' },
+      { name: 'AP-PORTARIA', x: 5.2, z: -3.2, status: 'ok', range: 2.4, detail: 'Operando. 3 aparelhos conectados.' },
     ],
     queixas: [{ x: 4.4, z: 3.2, texto: 'Coletor não conecta' }],
   },
@@ -530,16 +563,19 @@ export const WIFI_CASES: WifiCase[] = [
     question: 'Dois pontos falharam. Amarelo é sinal fraco, não queda.',
     walls: GALPAO,
     aps: [
-      { name: 'AP-ESCRITÓRIO', x: -4.6, z: -3.2, status: 'ok', range: 3.4, detail: 'Operando.' },
+      { name: 'AP-ESCRITÓRIO', x: -4.6, z: -3.2, status: 'ok', range: 3.2, detail: 'Operando.' },
       { name: 'AP-LINHA-1', x: 0.4, z: -3.4, status: 'falha', range: 0.6, detail: 'Fora do ar. O apontamento da linha 1 parou.' },
       { name: 'AP-LINHA-2', x: 2.4, z: -0.4, status: 'atencao', range: 2.2, detail: 'Sinal fraco por interferência do motor. Ainda conecta.' },
       { name: 'AP-EXPEDIÇÃO', x: 5.0, z: 3.2, status: 'falha', range: 0.6, detail: 'Cabo de rede rompido na canaleta.' },
-      { name: 'AP-REFEITÓRIO', x: -4.4, z: 3.4, status: 'ok', range: 3.0, detail: 'Operando.' },
-      { name: 'AP-DOCA', x: 0.2, z: 4.0, status: 'ok', range: 2.8, detail: 'Operando.' },
+      { name: 'AP-REFEITÓRIO', x: -4.4, z: 3.4, status: 'ok', range: 2.8, detail: 'Operando.' },
+      { name: 'AP-DOCA', x: 0.2, z: 4.0, status: 'ok', range: 2.6, detail: 'Operando.' },
+      { name: 'AP-ALMOXARIFADO', x: -2.2, z: 0.6, status: 'ok', range: 2.6, detail: 'Operando.' },
+      { name: 'AP-PORTARIA', x: 5.4, z: -3.4, status: 'ok', range: 2.2, detail: 'Operando.' },
+      { name: 'AP-MANUTENÇÃO', x: -1.0, z: -1.4, status: 'ok', range: 2.4, detail: 'Operando.' },
     ],
     queixas: [
-      { x: 0.6, z: -3.6, texto: 'Tablet caiu da rede' },
-      { x: 5.2, z: 3.0, texto: 'Sem sinal na doca' },
+      { x: 0.6, z: -3.6, texto: 'Coletor da linha 1 sem rede' },
+      { x: 4.8, z: 3.4, texto: 'Expedição sem sistema' },
     ],
   },
 ]

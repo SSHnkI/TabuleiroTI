@@ -61,6 +61,8 @@ Para voltar a qualquer uma delas, troque `ponto-zero` pelo nome da marca no coma
 | `fase2-som-e-impacto` | Som de arcade (ruido, impacto, explosao, combo, ambiente), congelamento de quadro, tranco de camera, tremor e destrocos em voxel nas 5 cenas 3D. 66 testes. |
 | `fase2-impacto-em-todos` | O mesmo impacto nos 12 desafios: estilhaco no ponto do dedo, onda de choque, selo de sequencia e leito de som tambem nos 7 que vivem no DOM. |
 | `fase2-pwa-e-celular` | Instalavel no celular (manifest, icones, service worker) e layout que empilha abaixo de 1024px. O estande em 1920x1080 nao muda em nada. |
+| `fase2-treino-e-atalhos` | Modo treino (escolhe o desafio, nao entra no placar), atalho escondido de apagar o placar no "o" de Expoplasti, e celular deitado em duas colunas. |
+| `fase3-densidade` | Os 12 desafios com cenario mais denso e decisao igual ou mais curta. O jogo cabe na tela do celular sem rolar. |
 
 ---
 

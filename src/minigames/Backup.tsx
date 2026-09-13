@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion } from 'motion/react'
 import {
   ShieldCheck, Camera, Database, Folder, Server, Check, HardDriveDownload,
+  Bell, Settings, Flag,
 } from 'lucide-react'
 import { HudLabel } from '@/components/hud'
 import { RESTORE_STEPS } from '@/game/content.ts'
@@ -21,6 +22,7 @@ import { useFx } from '@/visual/Fx.tsx'
 const ICONS: Record<string, typeof Check> = {
   shield: ShieldCheck, camera: Camera, database: Database,
   folder: Folder, server: Server, check: Check,
+  bell: Bell, settings: Settings, flag: Flag,
 }
 
 type Phase = 'mostrando' | 'repetindo' | 'errou'
@@ -102,7 +104,7 @@ export function Backup({ length, secondsLeft, onDone, onPenalty }: {
     : 'Agora repita, na mesma ordem'
 
   return (
-    <div className="grid h-full grid-rows-[auto_auto_1fr] px-4 amplo:px-12 pb-8">
+    <div className="desafio-1 grid h-full grid-rows-[auto_auto_1fr] px-4 amplo:px-12 pb-8">
       <div className="flex items-center justify-between pb-3">
         <div className="flex items-center gap-3">
           <HardDriveDownload size={26} strokeWidth={1.5} style={{ color: 'var(--color-cyan-core)' }} />

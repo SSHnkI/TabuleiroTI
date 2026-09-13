@@ -66,7 +66,7 @@ export function Triagem({ tickets, secondsLeft, onDone, onPenalty }: {
   }
 
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto] px-4 amplo:px-12 pb-8">
+    <div className="desafio-1 grid h-full grid-rows-[auto_1fr_auto] px-4 amplo:px-12 pb-8">
       <div className="flex items-center justify-between pb-3">
         <div className="flex items-center gap-3">
           <Inbox size={26} strokeWidth={1.5} style={{ color: 'var(--color-cyan-core)' }} />

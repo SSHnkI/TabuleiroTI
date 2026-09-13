@@ -503,8 +503,8 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
     : null
 
   return (
-    <div className="grid h-full grid-cols-1 gap-4 px-4 pb-4 amplo:grid-cols-[1fr_330px] amplo:gap-8 amplo:px-10 amplo:pb-6">
-      <div ref={labelBox} className="sala-3d relative min-h-[46vh] amplo:min-h-0">
+    <div className="desafio-2 grid h-full grid-cols-1 gap-4 px-4 pb-4 amplo:grid-cols-[1fr_330px] amplo:gap-8 amplo:px-10 amplo:pb-6">
+      <div ref={labelBox} className="sala-3d relative min-h-0">
         <div ref={hostRef} className="absolute inset-0" />
 
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -606,7 +606,7 @@ export function Seguranca({ seg, secondsLeft, onDone, onPenalty }: {
           ))}
         </div>
 
-        <div className="mb-3 flex items-center gap-2.5">
+        <div className="so-amplo mb-3 flex items-center gap-2.5">
           <span
             className="h-3 w-3"
             style={{ background: 'rgb(255,212,61)', boxShadow: '0 0 10px rgb(255,212,61)' }}

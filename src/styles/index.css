@@ -314,31 +314,66 @@
 }
 
 /* ------------------------------------------------------------- EM PE
-   A rolagem e o unico ponto em que o modo quiosque cede. Continua sem
-   pull-to-refresh e sem zoom por duplo toque: o que muda e so poder
-   alcancar o que ficou embaixo. */
+   O jogo CABE na tela. Nao rola.
+
+   A primeira tentativa deixou a pagina crescer e empilhar: deu uma tira
+   comprida, com cabecalho enorme, cena espremida no meio e metade do desafio
+   abaixo da dobra. Rolar durante uma partida cronometrada e o pior dos
+   mundos: o dedo procura e o relogio corre.
+
+   Agora a tela tem a altura exata do aparelho. Onde o conteudo nao cabe,
+   quem rola e o bloco por dentro, nunca a pagina. */
 @media (max-width: 1023px) and (orientation: portrait),
        (max-width: 599px) {
-  html, body {
-    overflow: auto;
-    height: auto;
-    min-height: 100%;
+  html, body, #root {
+    height: 100dvh;
+    overflow: hidden;
   }
 
-  #root {
-    height: auto;
-    min-height: 100dvh;
+  #root main {
+    height: 100dvh;
   }
 
-  /* Os containers de tela usam h-full, que dentro de um pai de altura
-     automatica vira zero. Aqui ganham altura minima de tela e crescem
-     com o conteudo. */
-  #root main,
-  #root main > div {
-    height: auto !important;
-    min-height: 100dvh;
-    overflow: visible !important;
+  /* Desafio com cena e painel: duas faixas dividindo a altura. A cena leva
+     um pouco mais, porque e nela que o dedo trabalha. */
+  .desafio-2 {
+    grid-template-rows: minmax(0, 1.15fr) minmax(0, 1fr);
   }
+
+  .desafio-2 > *,
+  .desafio-1 > * {
+    min-height: 0;
+  }
+
+  /* O painel de leitura rola por dentro. A cena 3D, nunca: arrastar ali e
+     girar o cenario, e uma rolagem roubaria o gesto. */
+  .desafio-2 > *:not(.sala-3d) {
+    overflow-y: auto;
+  }
+
+  /* Cabecalho do jogo mais baixo: cada pixel gasto em titulo e um pixel a
+     menos de cena. */
+  .hud-jogo {
+    padding-top: 8px;
+  }
+  .hud-jogo .hud-sub {
+    display: none;
+  }
+
+  /* Telas de leitura (regras, resultado, ranking, treino) rolam no miolo,
+     com o cabecalho e os botoes sempre a vista. */
+  .rola-miolo {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* O painel do desafio perde respiro de tela grande: cada margem de 20px
+     empurra a informacao que resolve o desafio para baixo da dobra. */
+  .desafio-2 > *:not(.sala-3d) .mb-5 { margin-bottom: .6rem; }
+  .desafio-2 > *:not(.sala-3d) .mb-4 { margin-bottom: .5rem; }
+
+  /* Enfeite de tela grande. No celular o espaco vale mais que a legenda. */
+  .so-amplo { display: none !important; }
 }
 
 /* ---------------------------------------------------------- DEITADO

@@ -40,7 +40,7 @@ export const SUPORTE_CASES: SuporteCase[] = [
   {
     difficulty: 'medio',
     label: 'Fila da manhã',
-    question: 'Três chamados abertos ao mesmo tempo. Toque na ordem de atendimento.',
+    question: 'Cinco chamados abertos ao mesmo tempo. Toque na ordem de atendimento.',
     incidentes: [
       {
         id: 'a', texto: 'Linha 2 parada: coletor não lê etiqueta', setor: 'Produção',
@@ -53,16 +53,26 @@ export const SUPORTE_CASES: SuporteCase[] = [
         why: 'Atrapalha e atrasa a emissão, mas existe outra impressora para contornar.',
       },
       {
-        id: 'c', texto: 'Pedido de mousepad novo', setor: 'Escritório',
+        id: 'c', texto: 'Telefone da portaria mudo', setor: 'Portaria',
+        x: 4.8, z: -3.4, urgencia: 2,
+        why: 'Incomoda a recepção de carga, mas o celular da portaria resolve por enquanto.',
+      },
+      {
+        id: 'd', texto: 'Pedido de mousepad novo', setor: 'Escritório',
         x: -4.2, z: 2.6, urgencia: 3,
         why: 'Solicitação sem urgência nenhuma. Entra na fila normal.',
+      },
+      {
+        id: 'e', texto: 'Trocar a foto do perfil no sistema', setor: 'Escritório',
+        x: -1.6, z: 3.6, urgencia: 3,
+        why: 'Não afeta trabalho nenhum. Pode esperar a semana virar.',
       },
     ],
   },
   {
     difficulty: 'dificil',
     label: 'Tudo ao mesmo tempo',
-    question: 'Cinco chamados. Toque do mais urgente ao menos urgente.',
+    question: 'Sete chamados. Toque do mais urgente ao menos urgente.',
     incidentes: [
       {
         id: 'a', texto: 'Alguém clicou em link suspeito e digitou a senha', setor: 'Escritório',
@@ -85,13 +95,24 @@ export const SUPORTE_CASES: SuporteCase[] = [
         why: 'Reduz produtividade de uma pessoa, sem impedir o trabalho.',
       },
       {
-        id: 'e', texto: 'Trocar o papel de parede da recepção', setor: 'Recepção',
+        id: 'e', texto: 'Câmera da doca fora do ar', setor: 'Expedição',
+        x: 3.2, z: 4.2, urgencia: 2,
+        why: 'A doca fica sem gravação, mas a operação continua rodando hoje.',
+      },
+      {
+        id: 'f', texto: 'Trocar o papel de parede da recepção', setor: 'Recepção',
         x: -1.0, z: 4.0, urgencia: 3,
         why: 'Estético. Não afeta trabalho nenhum.',
+      },
+      {
+        id: 'g', texto: 'Instalar um segundo monitor no comercial', setor: 'Escritório',
+        x: -2.6, z: -0.6, urgencia: 3,
+        why: 'Melhoria de conforto. O trabalho acontece do mesmo jeito sem ela.',
       },
     ],
   },
 ]
+
 
 /* =============================================================== SEGURANCA
    Mecanica: um globo com os acessos chegando a empresa. O jogador gira e

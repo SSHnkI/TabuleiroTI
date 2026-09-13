@@ -57,7 +57,7 @@ export function GameHud({
   const tone = TONE[spec.difficulty]
 
   return (
-    <header className="relative px-4 pt-4 amplo:px-9 amplo:pt-6" style={{ zIndex: 35 }}>
+    <header className="hud-jogo relative px-4 pt-4 amplo:px-9 amplo:pt-6" style={{ zIndex: 35 }}>
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3 amplo:flex-nowrap amplo:gap-8">
         {/* ------------------------------------------------ etapa e progresso */}
         <div className="order-last w-full min-w-0 amplo:order-none amplo:w-auto amplo:flex-1">
@@ -95,7 +95,7 @@ export function GameHud({
           >
             {spec.label}
           </h2>
-          <p className="text-[13px]" style={{ color: 'var(--color-micro)' }}>{KIND[spec.id]}</p>
+          <p className="hud-sub text-[13px]" style={{ color: 'var(--color-micro)' }}>{KIND[spec.id]}</p>
 
           <div className="mt-2.5 flex items-center gap-3">
             <HudLabel>Sistema restaurado</HudLabel>

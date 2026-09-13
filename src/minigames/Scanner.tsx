@@ -61,7 +61,7 @@ export function Scanner({ erp, secondsLeft, onDone, onPenalty }: {
   }
 
   return (
-    <div className="grid h-full grid-cols-1 items-center gap-4 px-4 pb-4 amplo:grid-cols-[1.25fr_.75fr] amplo:gap-10 amplo:px-12 amplo:pb-10">
+    <div className="desafio-2 grid h-full grid-cols-1 items-center gap-4 px-4 pb-4 amplo:grid-cols-[1.25fr_.75fr] amplo:gap-10 amplo:px-12 amplo:pb-10">
       {/* ------------------------------------------------------ tela do ERP */}
       <Panel className="relative overflow-hidden p-4 amplo:p-8" tone="cyan">
         {/* Varredura continua. E o que diz "estamos procurando alguma coisa". */}

@@ -220,7 +220,7 @@ function SegredoO({ onSegurar }: { onSegurar: () => void }) {
   return (
     <span
       role="presentation"
-      style={{ cursor: 'inherit', touchAction: 'none' }}
+      style={{ cursor: 'inherit', touchAction: 'none', position: 'relative' }}
       onPointerDown={e => {
         e.stopPropagation()
         parar()
@@ -231,6 +231,25 @@ function SegredoO({ onSegurar }: { onSegurar: () => void }) {
       onPointerCancel={parar}
     >
       o
+      {/* A area de toque, invisivel e maior que a letra.
+          A letra tem 11x17 pixels, que no monitor do estande e 3x5mm:
+          escondido nao pode virar inatingivel. Esta caixa leva o alvo para
+          perto de 40px.
+          Por que sobreposta e nao respiro na propria letra: respiro exige
+          inline-block, e inline-block cria ponto de quebra de linha. O nome
+          da empresa comecou a quebrar como EXPO / PLASTI no cabecalho. */}
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute', inset: '-13px -14px', display: 'block',
+          // A regra de celular (#root main * { max-width: 100% }) existe para
+          // impedir que um botao largo empurre a tela. Aqui ela travava a
+          // area de toque na largura da propria letra, 11px, e o atalho
+          // voltava a ser inatingivel com o dedo. Estilo em linha vence a
+          // regra, e so aqui.
+          maxWidth: 'none', minWidth: 0,
+        }}
+      />
     </span>
   )
 }

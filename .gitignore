@@ -5,3 +5,7 @@ tsconfig.tsbuildinfo
 *.local
 .DS_Store
 Thumbs.db
+
+# Configuracao de ferramenta local, nao pertence ao repositorio
+.mcp.json
+.claude/

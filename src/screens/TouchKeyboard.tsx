@@ -73,7 +73,7 @@ export function TouchKeyboard({ count, onDone, onBack }: {
   }
 
   return (
-    <div className="grid h-full place-items-center px-8">
+    <div className="grid h-full place-items-center px-2 amplo:px-8">
       <motion.div
         className="w-full max-w-4xl"
         initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
@@ -106,7 +106,7 @@ export function TouchKeyboard({ count, onDone, onBack }: {
           </div>
         )}
 
-        <Panel className="mb-6 px-8 py-7" tone="cyan">
+        <Panel className="mb-3 px-4 py-4 amplo:mb-6 amplo:px-8 amplo:py-7" tone="cyan">
           <div className="flex items-center gap-4">
             <span
               className="h-10 w-1.5 shrink-0"
@@ -124,9 +124,15 @@ export function TouchKeyboard({ count, onDone, onBack }: {
           </div>
         </Panel>
 
-        <div className="space-y-2.5">
+        <div className="space-y-1.5 amplo:space-y-2.5">
           {ROWS.map((row, r) => (
-            <div key={r} className="flex justify-center gap-2.5" style={{ paddingInline: r * 22 }}>
+            <div
+              key={r}
+              className="flex justify-center gap-1 amplo:gap-2.5"
+              // O degrau de cada linha tambem encolhe: 22px por linha em tela
+              // de 375 empurraria a ultima fileira para fora.
+              style={{ paddingInline: 'calc(' + r + ' * min(22px, 1.6vw))' }}
+            >
               {row.split('').map(ch => (
                 <Key key={ch} onTap={() => type(ch)}>{ch}</Key>
               ))}
@@ -137,8 +143,8 @@ export function TouchKeyboard({ count, onDone, onBack }: {
               )}
             </div>
           ))}
-          <div className="flex justify-center gap-2.5 pt-1">
-            <Key onTap={() => type(' ')} className="min-w-[240px]">ESPAÇO</Key>
+          <div className="flex justify-center gap-1 pt-1 amplo:gap-2.5">
+            <Key onTap={() => type(' ')} className="w-full amplo:min-w-[240px]">ESPAÇO</Key>
             <Key onTap={reroll} wide tone="ghost">
               <Shuffle size={22} strokeWidth={1.6} />
               <span className="ml-2 text-[13px]">OUTRO NOME</span>
@@ -146,7 +152,7 @@ export function TouchKeyboard({ count, onDone, onBack }: {
           </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-center gap-4">
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3 amplo:mt-8 amplo:gap-4">
           <button
             type="button"
             onPointerDown={onBack}
@@ -155,7 +161,7 @@ export function TouchKeyboard({ count, onDone, onBack }: {
           >
             voltar
           </button>
-          <BigButton onTap={advance} disabled={!canFinish} tone="success" className="min-w-[280px]">
+          <BigButton onTap={advance} disabled={!canFinish} tone="success" className="w-full amplo:min-w-[280px]">
             {active < count - 1 ? 'PRÓXIMO JOGADOR' : 'ENTRAR NA MISSÃO'}
             <Check size={20} className="ml-2 inline" />
           </BigButton>
@@ -181,12 +187,15 @@ function Key({ children, onTap, wide, tone = 'key', className }: {
       onPointerCancel={() => setDown(false)}
       className={'flex items-center justify-center outline-none ' + (className ?? '')}
       style={{
-        // 72px de lado. Dedo grosso, tela engordurada, pessoa em pe e com pressa.
-        minWidth: wide ? 120 : 72,
-        height: 72,
+        // 72px de lado no estande: dedo grosso, tela engordurada, pessoa em
+        // pe e com pressa. Num celular de 375 as dez teclas da primeira fila
+        // somariam 810px, entao a tecla encolhe ate caber, com piso no
+        // tamanho de tecla de teclado de celular.
+        minWidth: wide ? 'clamp(74px, 30vw, 120px)' : 'clamp(30px, 8.4vw, 72px)',
+        height: 'clamp(46px, 9vw, 72px)',
         fontFamily: 'var(--font-display)',
         fontWeight: 600,
-        fontSize: 24,
+        fontSize: 'clamp(15px, 3.6vw, 24px)',
         color: tone === 'ghost' ? 'var(--color-label)' : '#EAFBFF',
         background: down
           ? 'linear-gradient(160deg, rgba(21,199,255,.32), rgba(10,110,146,.2))'

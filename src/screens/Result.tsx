@@ -202,10 +202,10 @@ export function Result({ score, results, teamName, position, total, training, on
 
       {/* ------------------------------------------------------------ rodape */}
       <motion.div animate={show(5)} transition={{ duration: 0.4 }} className="flex items-center justify-center gap-5 pt-4">
-        <BigButton onTap={onRanking} tone="ghost" className="min-w-[240px]">
+        <BigButton onTap={onRanking} tone="ghost" className="w-full amplo:min-w-[240px]">
           <ListOrdered size={19} className="mr-2 inline" /> VER RANKING
         </BigButton>
-        <BigButton onTap={onAgain} className="min-w-[260px]">
+        <BigButton onTap={onAgain} className="w-full amplo:min-w-[260px]">
           <RotateCcw size={19} className="mr-2 inline" /> PRÓXIMO JOGADOR
         </BigButton>
       </motion.div>

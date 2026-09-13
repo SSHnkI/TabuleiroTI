@@ -130,14 +130,14 @@ export function Timeline({ timeline, secondsLeft, onDone }: {
                     a um minuto um do outro numa janela de trinta, e na mesma
                     linha eles se sobrepoem e viram borrao. */}
                 <div
-                  className="tnum absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[13px]"
+                  className="tnum absolute left-1/2 hidden -translate-x-1/2 whitespace-nowrap text-[13px] amplo:block"
                   style={{ color: 'var(--color-micro)', top: i % 2 === 0 ? 20 : 40 }}
                 >
                   {ev.label}
                 </div>
                 {i % 2 === 1 && (
                   <div
-                    className="absolute left-1/2 top-3 h-5 w-px -translate-x-1/2"
+                    className="absolute left-1/2 top-3 hidden h-5 w-px -translate-x-1/2 amplo:block"
                     style={{ background: 'rgba(21,199,255,.25)' }}
                   />
                 )}

@@ -63,7 +63,7 @@ export function Scanner({ erp, secondsLeft, onDone, onPenalty }: {
   return (
     <div className="grid h-full grid-cols-1 items-center gap-4 px-4 pb-4 amplo:grid-cols-[1.25fr_.75fr] amplo:gap-10 amplo:px-12 amplo:pb-10">
       {/* ------------------------------------------------------ tela do ERP */}
-      <Panel className="relative overflow-hidden p-8" tone="cyan">
+      <Panel className="relative overflow-hidden p-4 amplo:p-8" tone="cyan">
         {/* Varredura continua. E o que diz "estamos procurando alguma coisa". */}
         <div
           aria-hidden
@@ -96,7 +96,7 @@ export function Scanner({ erp, secondsLeft, onDone, onPenalty }: {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-5 gap-y-2.5">
+        <div className="grid grid-cols-1 gap-x-5 gap-y-2 amplo:grid-cols-2 amplo:gap-y-2.5">
           {fields.map(f => {
             const hit = found.includes(f.id)
             const bad = wrong === f.id
@@ -118,7 +118,7 @@ export function Scanner({ erp, secondsLeft, onDone, onPenalty }: {
               >
                 <HudLabel>{f.label}</HudLabel>
                 <div
-                  className="mt-0.5 truncate"
+                  className="mt-0.5 break-words amplo:truncate"
                   style={{
                     fontFamily: f.mono ? 'var(--font-mono)' : 'var(--font-sans)',
                     fontSize: 19,

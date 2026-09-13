@@ -65,7 +65,7 @@ export function Admin({ runs, perf, muted, onMute, onRuns, onClose, onTreino }: 
         </Panel>
       )}
 
-      <div className="mb-6 grid grid-cols-5 gap-4">
+      <div className="mb-6 grid grid-cols-1 amplo:grid-cols-2 amplo:grid-cols-5 gap-4">
         <Metric label="Jogadores" value={s.played} />
         <Metric label="Equipes" value={s.teams} />
         <Metric label="Média" value={s.average} />
@@ -154,7 +154,7 @@ export function Admin({ runs, perf, muted, onMute, onRuns, onClose, onTreino }: 
           </div>
 
           <HudLabel className="mb-2">Nível do visual</HudLabel>
-          <div className="mb-2 grid grid-cols-4 gap-2">
+          <div className="mb-2 grid grid-cols-2 amplo:grid-cols-4 gap-2">
             {(['full', 'reduced', 'minimal'] as PerfTier[]).map(t => (
               <TierButton key={t} tier={t} active={perf.tier === t && perf.forced} onTap={() => forceTier(t)} />
             ))}

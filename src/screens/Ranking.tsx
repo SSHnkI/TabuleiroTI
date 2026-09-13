@@ -34,7 +34,7 @@ export function Ranking({ runs, highlightAt, onBack }: {
             RANKING
           </h1>
         </div>
-        <div className="flex gap-10">
+        <div className="flex gap-5 amplo:gap-10">
           <Stat label="Jogadores" value={s.played} />
           <Stat label="Equipes" value={s.teams} />
           <Stat label="Média" value={s.average} />
@@ -42,7 +42,7 @@ export function Ranking({ runs, highlightAt, onBack }: {
         </div>
       </header>
 
-      <div className="grid min-h-0 grid-cols-2 gap-7">
+      <div className="grid min-h-0 grid-cols-1 amplo:grid-cols-2 gap-7">
         <Board
           title="Individual"
           icon={<User size={20} strokeWidth={1.6} />}
@@ -58,7 +58,7 @@ export function Ranking({ runs, highlightAt, onBack }: {
       </div>
 
       <div className="flex justify-center pt-6">
-        <BigButton onTap={onBack} className="min-w-[300px]">VOLTAR AO INÍCIO</BigButton>
+        <BigButton onTap={onBack} className="w-full amplo:min-w-[300px]">VOLTAR AO INÍCIO</BigButton>
       </div>
     </div>
   )

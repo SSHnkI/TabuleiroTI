@@ -51,14 +51,14 @@ export function ModeSelect({ onPick, onBack }: {
         >
           <HudLabel className="mb-3 text-center">Formação da equipe</HudLabel>
           <h2
-            className="mb-10 text-center"
+            className="mb-5 text-center amplo:mb-10"
             style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(24px, 4.4vw, 54px)' }}
           >
             QUANTOS VÃO JOGAR?
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 gap-3 amplo:grid-cols-4 amplo:gap-5">
           {COUNTS.map((c, i) => {
             const active = count === c.n
             return (
@@ -70,7 +70,7 @@ export function ModeSelect({ onPick, onBack }: {
                 initial={{ opacity: 0, y: 22 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, delay: i * 0.05, ease: EASE_OUT }}
-                className="relative px-5 py-8 text-center outline-none"
+                className="relative px-3 py-5 text-center outline-none amplo:px-5 amplo:py-8"
                 style={{
                   border: `1px solid ${active ? 'var(--color-cyan-core)' : 'rgba(21,199,255,.2)'}`,
                   background: active
@@ -105,10 +105,10 @@ export function ModeSelect({ onPick, onBack }: {
 
         {/* Segunda decisao na MESMA tela. Uma etapa a mais custaria segundos
             multiplicados por centenas de jogadores ao longo do dia. */}
-        <div className="mt-8 min-h-[132px]">
+        <div className="mt-5 min-h-[132px] amplo:mt-8">
           {count === 1 ? (
             <div className="flex justify-center">
-              <BigButton onTap={() => choose('competir')} className="min-w-[300px]">
+              <BigButton onTap={() => choose('competir')} className="w-full amplo:min-w-[300px]">
                 COMEÇAR <User size={20} className="ml-2 inline" />
               </BigButton>
             </div>
@@ -118,7 +118,7 @@ export function ModeSelect({ onPick, onBack }: {
               transition={{ duration: 0.3, ease: EASE_OUT }}
             >
               <HudLabel className="mb-3 text-center">E aí, vai ser como?</HudLabel>
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 gap-3 amplo:grid-cols-2 amplo:gap-5">
                 <Choice
                   icon={<Swords size={30} strokeWidth={1.5} />}
                   title="COMPETIR"

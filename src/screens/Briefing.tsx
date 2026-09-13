@@ -77,7 +77,7 @@ export function Briefing({ mode, players, onStart, onBack }: {
           </h1>
         </div>
 
-        <div className="grid grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 amplo:grid-cols-3 gap-5">
           {regras.map((r, i) => (
             <motion.div
               key={r.title}
@@ -166,7 +166,7 @@ export function Briefing({ mode, players, onStart, onBack }: {
           >
             voltar
           </button>
-          <BigButton onTap={onStart} tone="success" className="min-w-[360px]">
+          <BigButton onTap={onStart} tone="success" className="w-full amplo:min-w-[360px]">
             ENTENDI, COMEÇAR
             <span className="tnum ml-3 opacity-60">{left}</span>
           </BigButton>

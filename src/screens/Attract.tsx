@@ -177,7 +177,7 @@ export function Attract({ runs, onStart, onRuns }: {
 
       {/* ---------------------------------------------------- faixa inferior */}
       <footer className="flex items-end justify-between">
-        <div className="flex gap-12">
+        <div className="flex flex-wrap gap-6 amplo:gap-12">
           <Stat label="Jogadores hoje" value={s.played} />
           <Stat label="Equipes" value={s.teams} />
           <Stat label="Recorde" value={s.best} tone="var(--color-signal-yellow)" />

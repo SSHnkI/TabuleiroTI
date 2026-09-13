@@ -132,7 +132,7 @@ export function Backup({ length, secondsLeft, onDone, onPenalty }: {
       </div>
 
       {/* --------------------------------------------------------- os botoes */}
-      <div className="grid grid-cols-3 grid-rows-2 gap-5">
+      <div className="grid grid-cols-1 amplo:grid-cols-3 grid-rows-2 gap-5">
         {RESTORE_STEPS.map((step, i) => {
           const Icon = ICONS[step.icon] ?? Check
           const aceso = phase === 'mostrando' && highlight >= 0 && seq[highlight]?.id === step.id

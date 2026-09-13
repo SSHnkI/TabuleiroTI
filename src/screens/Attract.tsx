@@ -5,7 +5,7 @@
  * atravessa o corredor para jogar. Como ninguem esta lendo nem tocando,
  * aqui a intensidade visual pode ser maxima, sem prejudicar a latencia.
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { EncryptedText } from '@/components/ui/encrypted-text'
 import { NumberTicker } from '@/components/motion/number-ticker'
@@ -18,11 +18,13 @@ import { EASE_OUT } from '@/lib/ease'
 
 const ROTATE_MS = 7000
 
-export function Attract({ runs, onStart, onRuns }: {
+export function Attract({ runs, onStart, onRuns, onTreino }: {
   runs: Run[]
   onStart: () => void
   /** Chamado quando o placar e apagado pelo atalho escondido. */
   onRuns: (runs: Run[]) => void
+  /** Atalho escondido para o modo treino. */
+  onTreino: () => void
 }) {
   const [slide, setSlide] = useState(0)
   const [pedindoApagar, setPedindoApagar] = useState(false)
@@ -62,7 +64,7 @@ export function Attract({ runs, onStart, onRuns }: {
             um visitante curioso nao pode apagar o ranking por acidente.
             Segurar, e nao tocar, e o que garante as duas coisas. */}
         <HudLabel>
-          Estande TI · Exp<SegredoO onSegurar={() => setPedindoApagar(true)} />plasti
+          Estande TI · Exp<Segredo onSegurar={() => setPedindoApagar(true)}>o</Segredo>plasti
         </HudLabel>
       </header>
 
@@ -83,7 +85,15 @@ export function Attract({ runs, onStart, onRuns }: {
               style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(34px, 9vw, 132px)' }}
             >
               <span style={{ color: '#EAFBFF' }}>MISSÃO</span>{' '}
-              <span style={{ color: 'var(--color-cyan-core)', textShadow: 'var(--glow-cyan)' }}>TI</span>
+              {/* Segure o TI por um segundo e meio e cai no modo treino.
+                  Alvo enorme e facil de achar quando se sabe, e inofensivo
+                  se alguem disparar sem querer: treino nao apaga nem grava
+                  nada, e sai com um toque em Voltar.
+                  O gesto e o mesmo do 'o' que apaga o placar, entao o
+                  operador decora um jeito so. */}
+              <Segredo onSegurar={onTreino}>
+                <span style={{ color: 'var(--color-cyan-core)', textShadow: 'var(--glow-cyan)' }}>TI</span>
+              </Segredo>
             </h1>
 
             <div
@@ -207,7 +217,10 @@ function Stat({ label, value, tone = '#EAFBFF' }: { label: string; value: number
  * Nao muda de aparencia: precisa parecer letra, senao deixa de ser atalho e
  * vira botao. O unico sinal e o proprio tempo de espera.
  */
-function SegredoO({ onSegurar }: { onSegurar: () => void }) {
+function Segredo({ children, onSegurar }: {
+  children: ReactNode
+  onSegurar: () => void
+}) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const parar = () => {
@@ -230,8 +243,8 @@ function SegredoO({ onSegurar }: { onSegurar: () => void }) {
       onPointerLeave={parar}
       onPointerCancel={parar}
     >
-      o
-      {/* A area de toque, invisivel e maior que a letra.
+      {children}
+      {/* A area de toque, invisivel e maior que o texto.
           A letra tem 11x17 pixels, que no monitor do estande e 3x5mm:
           escondido nao pode virar inatingivel. Esta caixa leva o alvo para
           perto de 40px.

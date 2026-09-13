@@ -48,11 +48,13 @@ export default function App() {
   /** Batidas no canto secreto que abre o painel do operador. */
   const knocks = useRef<number[]>([])
   const idleRef = useRef(Date.now())
+  /** De onde o modo treino foi aberto: o Voltar precisa devolver para la. */
+  const [origemTreino, setOrigemTreino] = useState<'attract' | 'admin'>('attract')
 
   useEffect(() => startPerfMonitor(), [])
 
   useEffect(() => {
-    if (ABRIR_TREINO) dispatch({ type: 'goto', screen: 'treino' })
+    if (ABRIR_TREINO) { setOrigemTreino('attract'); dispatch({ type: 'goto', screen: 'treino' }) }
   }, [])
 
   // O navegador so libera audio apos um gesto. Destravar no primeiro toque
@@ -179,7 +181,15 @@ export default function App() {
 
         <div className="relative h-full w-full" style={{ zIndex: 30 }}>
         {state.screen === 'attract' && (
-          <Attract runs={runs} onRuns={setRuns} onStart={() => dispatch({ type: 'goto', screen: 'mode' })} />
+          <Attract
+            runs={runs}
+            onRuns={setRuns}
+            onStart={() => dispatch({ type: 'goto', screen: 'mode' })}
+            onTreino={() => {
+              setOrigemTreino('attract')
+              dispatch({ type: 'goto', screen: 'treino' })
+            }}
+          />
         )}
         {state.screen === 'mode' && (
           <ModeSelect
@@ -265,14 +275,17 @@ export default function App() {
             onMute={v => { setMuted(v); setMutedState(v) }}
             onRuns={setRuns}
             onClose={() => dispatch({ type: 'abort' })}
-            onTreino={() => dispatch({ type: 'goto', screen: 'treino' })}
+            onTreino={() => {
+              setOrigemTreino('admin')
+              dispatch({ type: 'goto', screen: 'treino' })
+            }}
           />
         )}
 
         {state.screen === 'treino' && (
           <Treino
             onEscolher={id => dispatch({ type: 'treinar', id })}
-            onVoltar={() => dispatch({ type: 'goto', screen: ABRIR_TREINO ? 'attract' : 'admin' })}
+            onVoltar={() => dispatch({ type: 'goto', screen: origemTreino })}
           />
         )}
 

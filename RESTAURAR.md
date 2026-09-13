@@ -86,6 +86,20 @@ git checkout main
 
 ---
 
+## Atalhos escondidos da tela inicial
+
+Nao aparecem escritos em lugar nenhum da interface, de proposito: o operador
+precisa deles com a fila andando, e um visitante curioso nao pode achar por
+acaso. Os dois pedem SEGURAR por um segundo e meio, nao tocar.
+
+| Onde segurar | O que abre |
+|---|---|
+| O **TI** de MISSAO TI | Modo treino: escolhe o desafio, nao entra no placar |
+| O **o** de Exp**o**plasti | Apagar o placar do dia, com confirmacao |
+
+Tambem existe o painel do operador, com cinco toques rapidos no canto
+superior esquerdo, e o endereco direto do treino: `?treino=1`.
+
 ## Copia online (GitHub Pages)
 
 Existe um fluxo em `.github/workflows/pages.yml` que publica o jogo a cada push
